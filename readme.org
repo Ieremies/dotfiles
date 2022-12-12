@@ -1,0 +1,164 @@
+#+Title: Readme
+
+* Packages
+Update list of mirrors.
+#+begin_src bash
+sudo pacman-mirrors --continent # update list of mirrors
+sudo pacman -Syyu git base base-devel # system update, base packages
+#+end_src
+
+* Yay
+Install =yay=.
+#+begin_src bash
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+#+end_src
+
+For most things, I don't need to confirm:
+#+begin_src bash
+alias ya="yay --noconfirm "
+#+end_src
+
+* Git
+We gotta config git first.
+
+#+begin_src bash
+git config --global user.name "Ieremies Romero"
+git config --global user.email "ieremies@gmail.com"
+#+end_src
+
+[[https://git-scm.com/docs/git-credential-store][source]] So I don't have to put my password eveytime:
+#+begin_src bash
+git config --global credential.helper store
+#+end_src
+
+* Fonts
+#+begin_src bash
+ya nerd-fonts-roboto-mono nerd-fonts-jetbrains-mono ttf-nerd-fonts-fira-code
+#+end_src
+* Keyboard
+I use two major changes to my default brazilian keyboard:
+- capslock as both control and escape ([[https://gist.github.com/tanyuan/55bca522bf50363ae4573d4bdcf06e2e][xcape]])
+- swap ç and ;: keys
+
+#+begin_src bash :tangle bin/start.sh
+# make CapsLock behave like Ctrl:
+setxkbmap -option ctrl:nocaps
+
+# make short-pressed Ctrl behave like Escape:
+xcape -e 'Control_L=Escape'
+
+# swap mapping
+xmodmap -e "keycode 61 = ccedilla Ccedilla ccedilla Ccedilla dead_acute dead_doubleacute dead_acute"
+xmodmap -e "keycode 47 = semicolon colon semicolon colon dead_belowdot dead_abovedot dead_belowdot"
+#+end_src
+
+* Battery
+#+begin_src bash :tangle bin/battery.sh
+echo "80" > /sys/devices/platform/lg-laptop/battery_care_limit
+#+end_src
+In order to inprove battery life, I can limit my laptop battery to 80%, but it will reset at reboot. To fix that, I have a script ~bin/battery.sh~.
+#+begin_src bash
+sudo crontab -e
+#+end_src
+add the line:
+#+begin_src bash
+@reboot /home/ieremies/bin/battery.sh
+#+end_src
+
+* Eduroam
+To use eduroam edit ~/etc/NetworkManage/NetworkManager.conf~ and add
+#+begin_src
+[main]
+dhcp=dhclient
+#+end_src
+* Monitor resource
+#+begin_src bash
+ya powertop htop filelight auto-cpufreq
+
+# Calibrates powertop (needs time)
+sudo powertop -c
+#+end_src
+** TODO Powertop tunnables
+** TODO Auto-cpufreq
+
+* emacs
+#+begin_src bash
+# Install emacs
+ya emacs-nativecomp ripgrep fd xclip gitflow-avh
+
+# Install doom
+git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+~/.emacs.d/bin/doom install
+
+doom upgrade
+doom sync
+#+end_src
+
+https://www.emacswiki.org/emacs/EmacsAsDaemon
+
+Configuration files:
+- ~.doom.d/*~
+** spell/grammar checking
+#+begin_source bash
+ya aspell aspell-en aspell-pt languagetool
+
+pip install proselint
+#+end_source
+* shell
+#+begin_src bash
+ya -S kitty zsh
+
+chsh -s $(which zsh) # make zsh default
+
+sudo curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh # install zin framework
+
+echo "zmodule spaceship-prompt/spaceship-prompt --name spaceship --no-submodules" >> ~/.zimrc
+
+zimfw install # install its modules
+#+end_src
+
+Configuration files:
+- ~.zimrc~
+- ~.zshrc~
+- ~.config/kitty/kitty.conf~
+- ~.config/kitty/theme.conf~
+* Zathura
+#+begin_src bash
+ya -S zathura zathura-pdf-mupdf
+
+# Make it pdf default
+xdg-mime default org.pwmt.zathura.desktop application/pdf
+#+end_src
+* Reference management
+#+begin_src bash
+ya -S zotero-bin jabref
+
+pip install betterbib
+#+end_src
+
+I also need to install zotero's [[https://retorque.re/zotero-better-bibtex/][Better BibTeX]].
+* Backup
+#+begin_src bash
+ya -S rclone
+#+end_src
+
+See [[github.com/ieremies/backup]]
+
+* Latex
+#+begin_src bash
+ya -S texlive-most biber perl-clone
+#+end_src bash
+* Others
+#+begin_src bash
+ya -S telegram-desktop discord slack-desktop
+
+ya -S mathpix-snipping-tool expac flameshot
+
+ya -S google-chrome firefox
+
+ya -S steam steamlink stremio
+#+end_src
+- gurobi :: I only got it working by install gurobi via AUR and downloading, unpacking it in ~/opt/~ and building.
+

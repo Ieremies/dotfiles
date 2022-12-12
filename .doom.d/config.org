@@ -1,0 +1,689 @@
+#+TITLE: My Config
+#+PROPERTY: header-args :tangle config.el
+#+STARTUP: overview
+
+* to be done
+** TODO [#A] Adicionar linhas após o fim do dia na org-agenda
+** TODO Rearranjar o org-super-agenda
+*** [ ] Fazer uma subseção com as coisas comcluídas hoje.
+** TODO minted src blocks
+** TODO Use =org-special-blocks-extra= [[https://alhassy.github.io/org-special-block-extras/#Equational-Proofs][fonte]]
+Algo parecido com:
+#+begin_theorem [Nome do teorema]
+Teorema com [nome do teorema na frente] e com o nome do teorema, no latex, em verde, que nem o #+title
+#+end_theorem
+** TODO Permitir que o spell check cheque para pt e en ao mesmo tempo
+
+** TODO org-reveal
+https://www.youtube.com/watch?v=avtiR0AUVlo
+** TODO Sync ref with notes: org-noter
+https://www.youtube.com/watch?v=Un0ZRXTzufo
+
+https://www.youtube.com/watch?v=EjQRqd_3AnA&list=PLR2sw19qWZfuT7_2f66j3PzWa9gbQqx7W&index=10 -> https://github.com/Accacio/dots/blob/master/configs/doom/doom/config.el
+
+https://www.youtube.com/watch?v=lCc3UoQku-E
+https://github.com/yuchen-lea/org-media-note/issues/10
+~org-note-create-skeleton~ org-noter-pdftools-creat-skeleton seems to work better.
+
+#+begin_src elisp :tangle packages.el
+(package! org-noter-pdftools
+  :recipe (:host github :repo "fuxialexander/org-pdftools"))
+(package! org-pdftools
+  :recipe (:host github :repo "fuxialexander/org-pdftools"))
+#+end_src
+
+#+begin_src elisp
+(use-package! org-noter
+  :config
+  (setq
+   org-noter-pdftools-markup-pointer-color "yellow"
+   org-noter-notes-search-path '("~/org/notes/")
+   ;; org-noter-insert-note-no-questions t
+   org-noter-doc-split-fraction '(0.4 . 06)
+   org-noter-always-create-frame nil
+   org-noter-hide-other nil
+   org-noter-pdftools-free-pointer-icon "Note"
+   org-noter-pdftools-free-pointer-color "red"
+   org-noter-kill-frame-at-session-end nil
+   )
+  (map! :map (pdf-view-mode)
+        :leader
+        (:prefix-map ("n" . "notes")
+          :desc "Write notes"                    "w" #'org-noter)
+        )
+  )
+
+(use-package! org-pdftools
+  :hook (org-load . org-pdftools-setup-link))
+
+(use-package! org-noter-pdftools
+  :after org-noter
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)
+    )
+  )
+#+end_src
+*** TODO https://github.com/yuchen-lea/org-media-note
+** TODO Forge
+https://magit.vc/manual/forge/
+** TODO LSP consume muita bateria, talvez TRAMP?
+** TODO Proselint
+[[https://github.com/amperser/proselint][GitHub - amperser/proselint: A linter for prose.]]
+Pode ser instalado com ~pip install proselint~ e o flycheck irá automaticamente usá-lo
+
+* General
+#+BEGIN_SRC elisp
+(setq user-full-name "Ieremies Vieira da Fonseca Romero"
+      user-mail-address "ieremies@gmail.com"
+      doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14)
+      doom-theme 'doom-one
+      evil-want-fine-undo t
+      ;; performance
+      inhibit-compacting-font-caches t
+      display-line-numbers-type nil
+      frame-title-format "%f - Emacs"
+      )
+#+end_src
+** Center search result
+#+begin_src elisp
+(advice-add 'evil-ex-search-next :after
+            (lambda (&rest x) (evil-scroll-line-to-center (line-number-at-pos))))
+(advice-add 'evil-ex-search-previous :after
+            (lambda (&rest x) (evil-scroll-line-to-center (line-number-at-pos))))
+#+end_src
+
+* App
+** calendar
+Adicionar os feriados relevantes para mim.
+#+begin_src elisp :results silent
+(after! calf-org
+(setq cfw:org-overwrite-default-keybinding t
+      calendar-holidays '((holiday-fixed 1 1   "Ano novo")
+                          (holiday-fixed 4 21  "Tiradentes")
+                          (holiday-fixed 5 1   "Dia do trabalhador")
+                          (holiday-float 5 0 2 "Dia das mães")
+                          (holiday-fixed 7 9   "Revolução constitucionalista")
+                          (holiday-float 8 0 2 "Dia dos pais")
+                          (holiday-fixed 9 7   "Independência")
+                          (holiday-fixed 10 12 "Dia das crianças")
+                          (holiday-fixed 10 28 "Dia do servidor público")
+                          (holiday-fixed 11 2  "Finados")
+                          (holiday-fixed 11 15 "Proclamação da república")
+                          (holiday-fixed 12 8  "Aniversário de Campinas")
+                          (holiday-fixed 12 25 "Natal")
+                          (holiday-easter-etc 0   "Pascoa")
+                          (holiday-easter-etc -2  "Sexta-feira santa")
+                          (holiday-easter-etc -46 "Quarta-feira de cinzas")
+                          (holiday-easter-etc -47 "Carnaval")
+                          (holiday-easter-etc -48 "Carnaval")
+                          (holiday-easter-etc 50  "Corpus-christi"))
+      ))
+#+end_src
+
+* Checkers
+** syntax
+** KILL spell - trava obscenamente
+CLOSED: [2022-11-20 dom 13:31]
+Using =spell-fu= and =aspell=.
+#+begin_src elisp :tangle no
+(after! spell-fu
+  (setq ispell-dictionary "pt_BR"))
+#+end_src
+** grammar
+O módulo de gramática vem com o =writegood-mode=, o que não me é útil.
+*** Language-tool
+Pode ser instalado com ~pacman -S languagetool~
+#+begin_src elisp :tangle packages.el
+(package! languagetool
+  :recipe (:host github :repo "PillFall/languagetool.el"))
+#+end_src
+#+begin_src elisp
+;; source : doom's grammar module
+(use-package! langtool
+  :commands (langtool-check
+             langtool-check-done
+             langtool-show-message-at-point
+             langtool-correct-buffer)
+  :init (setq langtool-default-language "en-US")
+  :config
+    (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8"
+                                    "-cp" "/usr/share/languagetool:/usr/share/java/languagetool/*")
+      languagetool-console-command "org.languagetool.commandline.Main"
+      languagetool-server-command "org.languagetool.server.HTTPServer"))
+#+end_src
+
+* Completion
+** Company
+#+begin_src elisp
+(after! company
+  (setq company-idle-delay 0.5))
+#+end_src
+** Vertico
+Remove hiden files (dot files) from search.
+#+begin_src elisp
+;; add to $DOOMDIR/config.el, thank @henrik
+(defadvice! ignore-dot-prefix-in-file-completion-table (fun str pred flag)
+  "Call `completion-file-name-table' with a predicate that
+ignores matches starting with a dot, unless STR starts with a
+dot."
+  :around #'completion-file-name-table
+  (funcall fun str
+           (cond ((string-prefix-p "." (file-name-nondirectory str))
+                  pred)
+                 ((not pred)
+                  (lambda (str)
+                    (not (string-prefix-p "." str))))
+                 ((lambda (str)
+                    (and (not (string-prefix-p "." str))
+                         (funcall pred str)))))
+           flag))
+
+#+end_src
+
+* editor
+* emacs
+** Dired
+#+begin_src elisp
+(after! (:and dired evil-collection)
+  ;; allow for some movimentation in files like ranger
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-up-directory
+    "l" 'dired-find-file)
+  (setq delete-by-moving-to-trash t
+        ;; when u have 2 dired buffers, assume the other is the target
+        dired-dwin-target t)
+  ;; always hide details
+  (add-hook 'dired-mode-hook
+      (lambda ()
+        (dired-hide-details-mode)))
+  )
+#+end_src
+*** TODO https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
+* org
+** General config
+#+begin_src elisp
+(after! org
+  (setq org-directory "~/org/"
+        org-export-with-todo-keywords 'nil ; remove todo keywords from exports
+        org-log-done 'time ; log when a task was closed
+        org-archive-location ".%s_archive::"
+        org-blank-before-new-entry '((heading . t) (plain-list-item . auto))
+        org-export-default-language "pt"
+        )
+
+  (map! :leader :desc "Paste org subtree" "m s p"#'org-paste-subtree
+                :desc "Yank org subtree"  "m s y"#'org-copy-subtree
+                ;; switching capture with scratch
+                :desc "Org capture"    "x"#'org-capture
+                :desc "Scratch buffer" "X"#'doom/open-scratch-buffer)
+  )
+#+end_src
+
+** Smart quotes
+Está faltando a configuração para pt-br.
+#+begin_src elisp :results silent
+(after! ox
+(add-to-list 'org-export-smart-quotes-alist
+ '("pt"
+  (primary-opening :utf-8 "“" :html "&ldquo;" :latex "``" :texinfo "``")
+  (primary-closing :utf-8 "”" :html "&rdquo;" :latex "''" :texinfo "''")
+  (secondary-opening :utf-8 "‘" :html "&lsquo;" :latex "`" :texinfo "`")
+  (secondary-closing :utf-8 "’" :html "&rsquo;" :latex "'" :texinfo "'")
+  (apostrophe :utf-8 "’" :html "&rsquo;"))
+ ))
+#+end_src
+
+** Latex exporter
+#+begin_src elisp
+(after! org
+  (setq org-highlight-latex-and-related '(native)))
+#+end_src
+*** KILL Compiling latex images (org-fragtog)
+Permite que imagens latex sejam autocompiladas e substituidas
+
+#+BEGIN_SRC elisp :tangle packages.el
+(package! org-fragtog)
+#+END_SRC
+
+#+BEGIN_SRC elisp :tangle no
+(add-hook 'org-mode-hook 'org-fragtog-mode)
+#+END_SRC
+*** Centering latex preview fragments
+Código retirado de [[https://github.com/jkitchin/scimax][scimax]] para centralizar os preview de latex.
+Também conferir [[https://kitchingroup.cheme.cmu.edu/blog/category/orgmode/4/][eq]] para corrigir o número de equações.
+
+#+begin_src elisp :tangle packages.el
+(package! ov
+  :recipe (:host github :repo "emacsorphanage/ov"))
+#+end_src
+#+begin_src elisp
+(use-package ov)
+(after! org
+(plist-put org-format-latex-options :justify 'center))
+;; * Fragment justification
+(defun scimax-org-latex-fragment-justify (justification)
+  "Justify the latex fragment at point with JUSTIFICATION.
+JUSTIFICATION is a symbol for 'left, 'center or 'right."
+  (interactive
+   (list (intern-soft
+          (completing-read "Justification (left): " '(left center right)
+                           nil t nil nil 'left))))
+  (let* ((ov (ov-at))
+    (beg (ov-beg ov))
+    (end (ov-end ov))
+    (shift (- beg (line-beginning-position)))
+    (img (overlay-get ov 'display))
+    (img (and (and img (consp img) (eq (car img) 'image)
+         (image-type-available-p (plist-get (cdr img) :type)))
+         img))
+    space-left offset)
+    (when (and img
+          ;; This means the equation is at the start of the line
+          (= beg (line-beginning-position))
+          (or
+           (string= "" (s-trim (buffer-substring end (line-end-position))))
+           (eq 'latex-environment (car (org-element-context)))))
+      (setq space-left (- (window-max-chars-per-line) (car (image-size img)))
+            offset (floor (cond
+                           ((eq justification 'center)
+                            (- (/ space-left 2) shift))
+                           ((eq justification 'right)
+                            (- space-left shift))
+                           (t
+                            0))))
+      (when (>= offset 0)
+        (overlay-put ov 'before-string (make-string offset ?\ ))))))
+
+(defun scimax-org-latex-fragment-justify-advice (beg end image imagetype)
+  "After advice function to justify fragments."
+  (scimax-org-latex-fragment-justify (or (plist-get org-format-latex-options :justify) 'left)))
+
+(defun scimax-toggle-latex-fragment-justification ()
+  "Toggle if LaTeX fragment justification options can be used."
+  (interactive)
+  (if (not (get 'scimax-org-latex-fragment-justify-advice 'enabled))
+        (progn
+          (advice-add 'org--make-preview-overlay :after 'scimax-org-latex-fragment-justify-advice)
+          (put 'scimax-org-latex-fragment-justify-advice 'enabled t)
+          (message "Latex fragment justification enabled"))
+        (advice-remove 'org--make-preview-overlay 'scimax-org-latex-fragment-justify-advice)
+        (put 'scimax-org-latex-fragment-justify-advice 'enabled nil)
+        (message "Latex fragment justification disabled")))
+
+(scimax-toggle-latex-fragment-justification)
+#+end_src
+*** Default preamble
+#+begin_src elisp
+(after! org
+  (add-to-list 'org-latex-packages-alist '("" "amsthm" t))
+  (add-to-list 'org-latex-packages-alist '("AUTO" "babel" t))
+  (add-to-list 'org-latex-packages-alist '("" "todonotes" t))  )
+#+end_src
+
+** Agenda
+#+begin_src elisp
+(after! org-agenda
+  (setq org-agenda-restore-windows-after-quit t
+
+        ;; show only two windows, the current and org-agenda
+        org-agenda-window-setup 'reorganize-frame
+
+        ;; I want it to be from the last sunday to the next wednesday (+11d)
+        org-agenda-span 'day
+        org-agenda-start-day nil
+        ;; org-agenda-start-on-weekday 0
+
+        ;; It will only show a warning of a deadline if it is between scheduled and deadline
+        org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled
+
+        ;; I think this one refers to continue to show scheduled after deadline has passed
+        org-agenda-skip-scheduled-delay-if-deadline 'post-deadline
+
+        org-agenda-start-with-log-mode t
+        org-agenda-log-mode-items '(clock)
+        org-agenda-weekend-days '(6)
+        org-agenda-columns-add-appointments-to-effort-sum  t
+        org-enforce-todo-dependencies nil
+        org-agenda-block-separator ""
+        )
+  ;; Workaround to add all .org file to agenda
+  (load-library "find-lisp")
+  (setq org-agenda-files (append (find-lisp-find-files "~/org" "\.org$")
+                                 (find-lisp-find-files "~/proj" "\.org$")))
+  )
+#+end_src
+*** [[https://github.com/alphapapa/org-super-agenda][org-super-agenda]]
+#+begin_src elisp :tangle packages.el
+(package! org-super-agenda)
+#+end_src
+#+begin_src elisp
+(use-package org-super-agenda
+  :after org-agenda
+  :init
+  (setq date-plus-30 (org-read-date nil nil "+30")
+        org-super-agenda-groups `((:discard (:deadline (after, date-plus-30)))
+                                  (:name "Late!"
+                                         :scheduled past
+                                         :deadline past)
+                                  (:name "Today"
+                                         :time-grid t
+                                         :deadline today
+                                         :scheduled today)
+                                  (:name "Comming up..."
+                                         :auto-category t
+                                         )))
+  (org-super-agenda-mode))
+#+end_src
+
+*** [[github:alphapapa/org-ql][org-ql]]
+#+begin_src elisp :tangle packages.el
+(package! org-ql)
+#+end_src
+
+Esse comando serve para complementar a minha agenda.
+Nele, eu quero a agenda do dia e, embaixo, uma lista das tarefas futuras que não possuem scheduled
+#+begin_src elisp
+(after! org-agenda
+  (setq date-plus-15 (org-read-date nil nil "+15")
+        org-agenda-custom-commands
+        '(("h" "Daily view"
+           ((agenda)
+            (org-ql-block '(and (todo "TODO")
+                                (not (scheduled))
+                                (not (deadline))
+                                (not (descendants (todo "TODO")))
+                                )
+                          ((org-ql-block-header "Backlog")))
+            ))
+          )
+        )
+
+  (defun my-agenda-command ()
+    "Abre a custon view diária da agenda"
+    (interactive)
+    (org-agenda nil "h"))
+
+  (map! (:map org-mode-map
+         :leader
+         "a" #'my-agenda-command))
+  )
+(after! org-agenda
+  (setq org-agenda-cmp-user-defined 'my-cmp-agenda))
+#+end_src
+
+** KILL [[https://github.com/bastibe/org-journal][org-journal]]
+CLOSED: [2022-11-17 qui 16:27]
+
+#+begin_src elisp :tangle no
+(setq org-journal-file-type 'weekly ;; a file represents a week
+      org-journal-dir "~/org/journal/"
+      org-journal-file-format "%Y %V - %m %d.org" ;; must contain %Y %m %d when using 'weekly
+      org-extend-today-until 3
+      )
+
+(defun org-journal-find-location ()
+  ;; Open today's journal, but specify a non-nil prefix argument in order to
+  ;; inhibit inserting the heading; org-capture will insert the heading.
+  (org-journal-new-entry t)
+  (unless (eq org-journal-file-type 'daily)
+    (org-narrow-to-subtree))
+  (goto-char (point-max)))
+
+(after! org
+  (map-put! org-capture-templates "j" '("Journal" plain (function org-journal-find-location)
+                                        "** %(format-time-string org-journal-time-format)%^{Title}\n%?"
+                                        :jump-to-captured t :immediate-finish t)))
+#+end_src
+
+** Research workflow
+*** [[https://github.com/emacs-citar/citar][citar]]
+Using emacs builtin reference managent.
+#+begin_src elisp
+(after! citar
+  (setq! citar-bibliography '("~/arq/bib.bib")
+         org-cite-global-bibliography '("~/arq/bib.bib")
+         citar-notes-paths '("~/org/bib")
+         ;; como eu vou ligar com os pdf e anotações?
+         ;; citar-library-paths '("/path/to/library/files/")
+         ;; citar-notes-paths '("/path/to/your/notes/")
+         ))
+#+end_src
+
+#+RESULTS:
+
+**** TODO https://github.com/andras-simonyi/org-cite-csl-activate
+*** [[https://www.orgroam.com/manual.html][Org-roam]]
+#+begin_src elisp
+(after! org-roam
+  (setq org-roam-directory "~/org/roam"
+        org-roam-capture-templates  '(("d" "default" plain "%?"
+                                       :if-new (file+head "${slug}.org"
+                                                          "#+title: ${title}\n#+created: %U\n\n%?")
+                                       :unnarrowed t))
+        ))
+#+end_src
+**** org-roam-bibtex
+#+begin_src elisp :tangle packages.el
+(package! org-roam-bibtex
+  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
+
+;; When using org-roam via the `+roam` flag
+(unpin! org-roam)
+
+;; When using bibtex-completion via the `biblio` module
+(unpin! bibtex-completion helm-bibtex ivy-bibtex)
+#+end_src
+
+#+begin_src elisp
+(use-package org-roam-bibtex
+  :after org-roam
+  :config
+  (org-roam-bibtex-mode))
+#+end_src
+**** org-roam-ui
+#+begin_src elisp :tangle packages.el
+(package! websocket)
+(package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+#+end_src
+#+begin_src elisp :tangle no
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam-ui
+;;  after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+    :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+end_src
+* lang
+** latex
+#+BEGIN_SRC elisp
+(setq +latex-viewers '(zathura))
+#+END_SRC
+* tools
+* ui
+** [[https://github.com/jrblevin/deft][deft]]
+If no files match your search string, pressing RET will create a new file using the string as the title. But I am not sure if this will conflict with =org-roam=
+#+begin_src elisp
+(after! deft
+  (setq deft-directory "~/org/"
+        deft-extensions '("org","txt")
+        deft-recursive t))
+#+end_src
+** ophints
+#+begin_src elisp
+(after! evil-goggles
+  (evil-goggles-mode)
+
+  ;; optionally use diff-mode's faces; as a result, deleted text
+  ;; will be highlighed with `diff-removed` face which is typically
+  ;; some red color (as defined by the color theme)
+  ;; other faces such as `diff-added` will be used for other actions
+  (evil-goggles-use-diff-faces))
+#+end_src
+** treemacs
+#+begin_src elisp
+(after! treemacs
+  (setq treemacs-width 25
+        treemacs-show-hidden-files 'nil
+        treemacs-hide-gitignored-files-mode 't
+        ))
+#+end_src
+* Mine!
+** KILL Computar effort a partir da quantidade de páginas
+Pontos importantes dessa função:
+=org-map-entries= itera sobre todas as headlines aplicando uma função sobre elas
+=org-entry-put= e =org-entry-get= pega e coloca valores nas propriedades das headlines
+#+begin_src elisp :tangle no
+(defun time-string-to-minutes ( s )
+  "Parse a time string to minutes (number)"
+    (+ (* (nth 2 (parse-time-string s)) 60) (nth 1 (parse-time-string s)))
+    )
+
+(defun get-factor ()
+  "Para cada uma das entradas eu pego o fator de mult por paginas"
+  (interactive)
+  (let (lista)
+    (org-map-entries
+     (lambda ()
+       (org-clock-sum)
+       (push (/ (float (time-string-to-minutes (org-entry-get (point) "CLOCKSUM")))
+                (float (string-to-number (org-entry-get (point) "PAGES"))))
+             lista))
+     "/+DONE" 'tree)
+    (if (/= (length lista) 0)
+        (ceiling (/ (apply '+ lista) (length lista)))
+      (string-to-number (read-from-minibuffer "Enter your factor: "))
+      )
+    )
+  )
+(defun my-effort ()
+  "Para cada uma das headlines, defina EFFORT as FACTOR * PAGES"
+  (interactive)
+  (let ((factor (get-factor)))
+    (org-map-entries
+     (lambda ()
+           (org-entry-put (point) "EFFORT"
+                          (number-to-string (* (string-to-number (org-entry-get (point) "PAGES")) factor)))
+       ) t 'tree)
+  ))
+#+end_src
+** KILL Effort from noter pages
+#+begin_src elisp :tangle no
+(defun my-noter_pages-to-effort ()
+  "Para cada uma das headlines, defina EFFORT as FACTOR * PAGES"
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (org-forward-heading-same-level 1)
+     (let ((fim (org-entry-get (point) "NOTER_PAGE")))
+       (org-entry-put (point) "PAGES" "0") ;; workaround
+       (org-backward-heading-same-level 1)
+       (org-entry-put (point) "PAGES" (number-to-string(- (string-to-number fim)
+                                                          (string-to-number (org-entry-get (point) "NOTER_PAGE"))))))
+     ) t 'tree)
+  )
+#+end_src
+** KILL Effort from duration
+#+begin_src elisp :tangle no
+(defun my-set-effort-from-appointment ()
+  (interactive)
+  (let ((context (org-element-context)))
+    (when (eq (org-element-type context) 'timestamp)
+      (if (org-element-property :minute-end context)
+      (org-entry-put (point) "EFFORT" (number-to-string(+ (* 60 (-
+                         (org-element-property :hour-end context)
+                         (org-element-property :hour-start context) ))
+                  (-
+                      (org-element-property :minute-end context)
+                      (org-element-property :minute-start context))
+                  ))))
+      )))
+
+
+(defun my-update-effort-from-appointment ()
+  (interactive)
+  (beginning-of-buffer)
+  (while (< (point) (point-max))
+    (my-set-effort-from-appointment)
+    (forward-line)
+   ))
+#+end_src
+* N A N O
+** layout
+#+begin_src elisp :tangle no
+(setq default-frame-alist
+      (append (list
+	           '(min-height . 1)
+               '(height     . 45)
+	           '(min-width  . 1)
+               '(width      . 81)
+               '(vertical-scroll-bars . nil)
+               '(internal-border-width . 24)
+               '(left-fringe    . 1)
+               '(right-fringe   . 1)
+               '(tool-bar-lines . 0)
+               '(menu-bar-lines . 0))))
+
+;; Not sure what this does
+(setq x-underline-at-descent-line t)
+
+;; Vertical window divider
+(setq window-divider-default-right-width 20)
+(setq window-divider-default-places 'right-only)
+(window-divider-mode 1)
+(set-face-attribute 'window-divider nil
+                    :foreground (face-background 'default))
+#+end_src
+#+begin_src elisp :tangle no
+(add-to-list 'load-path "~/bin/nano-emacs")
+(setq nano-font-size 14)
+(require 'nano)
+
+
+
+(after! org
+  (set-face 'org-done                   'nano-face-faded)
+  (set-face 'org-headline-done          'nano-face-strong)
+  (set-face 'org-code                   'nano-face-subtle)
+  (set-face 'org-upcoming-deadline      'nano-face-faded)
+  (set-face 'org-code                   'nano-face-faded)
+  ;;(set-face 'org-list-dt                'nano-face-subtle )
+  )
+(after! diredfl
+  (set-face 'diredfl-dir-name           'nano-face-salient)
+  (set-face 'diredfl-file-suffix        'nano-face-faded)
+  (set-face 'diredfl-flag-mark-line     'highlight)
+  (set-face 'diredfl-file-name          'nano-face-strong)
+  (set-face 'diredfl-dir-heading        'nano-face-header-popout)
+  )
+(after! evil
+  (set-face 'evil-ex-substitute-matches 'nano-face-popout)
+  )
+(after! highlight-indent-guides
+  (set-face 'highlight-indent-guides-character-face 'nano-face-faded))
+(after! nano
+  (set-face-attribute 'mode-line nil
+                      :foreground "#FFFFFF"
+                      :underline "#ECEFF1")
+  (set-face-attribute 'mode-line-inactive nil
+                      :foreground "#FFFFFF"
+                      :underline "#ECEFF1")
+  )
+(after! org-journal
+  (set-face 'org-journal-calendar-entry-face 'nano-face-salient))
+(after! org-agenda
+  (set-face 'org-agenda-calendar-event 'nano-face-faded))
+#+end_src
+* Modern
+#+begin_src elisp :tangle packages.el
+(package! org-modern
+  :recipe (:host github :repo "minad/org-modern"))
+#+end_src
