@@ -68,16 +68,20 @@ https://github.com/yuchen-lea/org-media-note/issues/10
 ** TODO Forge
 https://magit.vc/manual/forge/
 ** TODO LSP consume muita bateria, talvez TRAMP?
+** TODO Quando eu digitar $, automaticamente colocar $$ e o cursor no meio.
 ** TODO Proselint
 [[https://github.com/amperser/proselint][GitHub - amperser/proselint: A linter for prose.]]
 Pode ser instalado com ~pip install proselint~ e o flycheck irá automaticamente usá-lo
+** TODO [[https://github.com/xenodium/company-org-block][xenodium/company-org-block]]
+** TODO [[https://github.com/natrys/whisper.el][GitHub - natrys/whisper.el: Speech-to-Text interface for Emacs using OpenAI's...]]
+** TODO [[https://github.com/magnars/expand-region.el][GitHub - magnars/expand-region.el: Emacs extension to increase selected regio...]]
 
 * General
 #+BEGIN_SRC elisp
 (setq user-full-name "Ieremies Vieira da Fonseca Romero"
       user-mail-address "ieremies@gmail.com"
       doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14)
-      doom-theme 'doom-one
+      doom-theme 'doom-nord
       evil-want-fine-undo t
       ;; performance
       inhibit-compacting-font-caches t
@@ -85,6 +89,10 @@ Pode ser instalado com ~pip install proselint~ e o flycheck irá automaticamente
       frame-title-format "%f - Emacs"
       )
 #+end_src
+
+#+RESULTS:
+: %f - Emacs
+
 ** Center search result
 #+begin_src elisp
 (advice-add 'evil-ex-search-next :after
@@ -450,9 +458,20 @@ Using emacs builtin reference managent.
          ))
 #+end_src
 
-#+RESULTS:
+**** TODO [[https://github.com/andras-simonyi/org-cite-csl-activate][andras-simonyi/org-cite-csl-activate]]
+#+begin_src elisp :tangle packages.el
+(package! oc-csl-activate
+  :recipe(:host github :repo "andras-simonyi/org-cite-csl-activate"))
+#+end_src
 
-**** TODO https://github.com/andras-simonyi/org-cite-csl-activate
+#+begin_src elisp
+(after! citar
+(require 'oc-csl-activate)
+(setq org-cite-activate-processor 'csl-activate))
+
+;; BUG isso tem cara de quem deixa as coisas lentas, não?
+(add-hook 'org-mode-hook (lambda () (cursor-sensor-mode 1)))
+#+end_src
 *** [[https://www.orgroam.com/manual.html][Org-roam]]
 #+begin_src elisp
 (after! org-roam
@@ -479,23 +498,28 @@ Using emacs builtin reference managent.
 (use-package org-roam-bibtex
   :after org-roam
   :config
-  (org-roam-bibtex-mode))
+  (org-roam-bibtex-mode)
+  (setq orb-roam-ref-format 'org-cite))
 #+end_src
+
+#+RESULTS:
+: t
+
 **** org-roam-ui
 #+begin_src elisp :tangle packages.el
 (package! websocket)
-(package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+(package! org-roam-ui)
 #+end_src
 #+begin_src elisp :tangle no
 (use-package! websocket
     :after org-roam)
 
 (use-package! org-roam-ui
-;;  after org-roam ;; or :after org
+    :after org-roam ;; or :after org
 ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
 ;;         a hookable mode anymore, you're advised to pick something yourself
 ;;         if you don't care about startup time, use
-    :hook (after-init . org-roam-ui-mode)
+;;  :hook (after-init . org-roam-ui-mode)
     :config
     (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
@@ -617,13 +641,12 @@ Pontos importantes dessa função:
    ))
 #+end_src
 * N A N O
-** layout
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (setq default-frame-alist
       (append (list
-	           '(min-height . 1)
+               '(min-height . 1)
                '(height     . 45)
-	           '(min-width  . 1)
+               '(min-width  . 1)
                '(width      . 81)
                '(vertical-scroll-bars . nil)
                '(internal-border-width . 24)
@@ -632,56 +655,60 @@ Pontos importantes dessa função:
                '(tool-bar-lines . 0)
                '(menu-bar-lines . 0))))
 
-;; Not sure what this does
-(setq x-underline-at-descent-line t)
+(setq inhibit-startup-screen 't
+      inhibit-startup-message 't
+      inhibit-startup-echo-area-message 't
+      initial-scratch-message 'nil
+
+      x-underline-at-descent-line 't
+
+      ;; No ugly button for checkboxes
+      widget-image-enable 'nil
+
+      ;; Hide org markup
+      org-hide-emphasis-markers 't
+
+      scroll-bar-mode -1
+
+      ;; Moderate font lock
+      font-lock-maximum-decoration 'nil)
+
+(setq-default line-spacing 1)
+
+;; Minimum window height
+(setq window-min-height 1)
 
 ;; Vertical window divider
-(setq window-divider-default-right-width 20)
-(setq window-divider-default-places 'right-only)
+(setq window-divider-default-right-width 24
+      window-divider-default-places 'right-only)
 (window-divider-mode 1)
+#+end_src
+#+begin_src elisp
+(setq doom-theme 'plain2)
+
+;;(setq nano-font-size 14)
+
+;; (require 'nano-theme)
+;; (nano-theme)
+;; (after! nano
+;;   (set-face-attribute 'mode-line nil
+;;                       :foreground "#FFFFFF"
+;;                       :underline "#ECEFF1")
+;;   (set-face-attribute 'mode-line-inactive nil
+;;                       :foreground "#FFFFFF"
+;;                       :underline "#ECEFF1")
+;;   )
+(global-hl-line-mode -1)
 (set-face-attribute 'window-divider nil
-                    :foreground (face-background 'default))
+                    :foreground (face-attribute 'default :background)
+                    :background (face-attribute 'default :background))
+(set-face-attribute 'font-lock-comment-face nil
+                    :slant 'italic)
+
 #+end_src
-#+begin_src elisp :tangle no
-(add-to-list 'load-path "~/bin/nano-emacs")
-(setq nano-font-size 14)
-(require 'nano)
 
+#+RESULTS:
 
-
-(after! org
-  (set-face 'org-done                   'nano-face-faded)
-  (set-face 'org-headline-done          'nano-face-strong)
-  (set-face 'org-code                   'nano-face-subtle)
-  (set-face 'org-upcoming-deadline      'nano-face-faded)
-  (set-face 'org-code                   'nano-face-faded)
-  ;;(set-face 'org-list-dt                'nano-face-subtle )
-  )
-(after! diredfl
-  (set-face 'diredfl-dir-name           'nano-face-salient)
-  (set-face 'diredfl-file-suffix        'nano-face-faded)
-  (set-face 'diredfl-flag-mark-line     'highlight)
-  (set-face 'diredfl-file-name          'nano-face-strong)
-  (set-face 'diredfl-dir-heading        'nano-face-header-popout)
-  )
-(after! evil
-  (set-face 'evil-ex-substitute-matches 'nano-face-popout)
-  )
-(after! highlight-indent-guides
-  (set-face 'highlight-indent-guides-character-face 'nano-face-faded))
-(after! nano
-  (set-face-attribute 'mode-line nil
-                      :foreground "#FFFFFF"
-                      :underline "#ECEFF1")
-  (set-face-attribute 'mode-line-inactive nil
-                      :foreground "#FFFFFF"
-                      :underline "#ECEFF1")
-  )
-(after! org-journal
-  (set-face 'org-journal-calendar-entry-face 'nano-face-salient))
-(after! org-agenda
-  (set-face 'org-agenda-calendar-event 'nano-face-faded))
-#+end_src
 * Modern
 #+begin_src elisp :tangle packages.el
 (package! org-modern

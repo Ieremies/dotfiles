@@ -1,9 +1,9 @@
-;;; doom-plain-theme.el --- inspired by gko's plain theme for VSCode -*- lexical-binding: t; no-byte-compile: t; -*-
+;;; doom-nano-light.el --- inspired by Nicolas Rougier's work -*- lexical-binding: t; no-byte-compile: t; -*-
 ;;
-;; Added: February 4, 2021 (#558)
-;; Author: das-s <https://github.com/das-s>
+;; Added: -
+;; Author: ieremies <https://github.com/ieremies>
 ;; Maintainer:
-;; Source: https://github.com/gko/plain/
+;; Source: https://github.com/ieremies/doom-nano
 ;;
 ;;; Commentary:
 ;;; Code:
@@ -14,20 +14,8 @@
 ;;
 ;;; Variables
 
-(defgroup doom-plain-theme nil
-  "Options for the `doom-plain' theme."
-  :group 'doom-themes)
-
-(defcustom doom-plain-padded-modeline doom-themes-padded-modeline
-  "If non-nil, adds a 4px padding to the mode-line.
-Can be an integer to determine the exact padding."
-  :group 'doom-plain-theme
-  :type '(or integer boolean))
-
-
 ;;
 ;;; Theme definition
-
 (def-doom-theme plain2
   "Theme inspired by gko's plain."
 
@@ -63,14 +51,14 @@ Can be an integer to determine the exact padding."
    (orange     '("#FFA726"))
    (green      '("#9CCC65"))
    (teal       '("#0097A7"))
-   (yellow     '("#FFEE58"))
+   (yellow     '("#FBC02D"))
    (magenta    '("#EC407A"))
    (violet     '("#AB47BC"))
    (cyan       '("#26C6DA"))
    (dark-cyan  '("#00838F"))
 
    ;; face categories -- required for all themes
-   (highlight      nano-subtle)
+   (highlight      nano-faded)
    (vertical-bar   base5)
    (selection      base1)
    (builtin        nano-salient)
@@ -85,7 +73,7 @@ Can be an integer to determine the exact padding."
    (strings        nano-popout)
    (variables      nano-strong)
    (numbers        base0)
-   (region         nano-subtle)
+   (region         nano-faded)
    (error          nano-critical)
    (warning        nano-popout)
    (success        nano-salient)
@@ -97,9 +85,9 @@ Can be an integer to determine the exact padding."
    (link           blue)
 
    ;; custom categories
-   (-modeline-pad
-    (when doom-plain-padded-modeline
-      (if (integerp doom-plain-padded-modeline) doom-plain-padded-modeline 4)))
+   (-modeline-pad 1)
+   ;;  (when doom-plain-padded-modeline
+   ;;    (if (integerp doom-plain-padded-modeline) doom-plain-padded-modeline 4)))
 
    (modeline-bg              (doom-darken bg-alt 0.15))
    (modeline-bg-alt          (doom-darken bg-alt 0.1))
@@ -111,11 +99,29 @@ Can be an integer to determine the exact padding."
   ;;;; Base theme face overrides
   ((error   :underline `(:style wave :color ,error))
    (warning :underline `(:style wave :color ,warning))
-   ((font-lock-constant-face &override)      :slant 'italic)
+   ;; Font-lock
+   ((font-lock-constant-face &override)      :weight 'normal)
    ((font-lock-comment-face &override)       :slant 'italic)
-   ((font-lock-function-name-face &override) :slant 'italic)
+   ((font-lock-function-name-face &override) :foreground fg :weight 'bold)
    ((font-lock-type-face &override)          :slant 'italic)
-   (hl-line :background base8)
+
+   ;; Tree-sitter
+   (tree-sitter-hl-face:number :slant 'normal)
+   (tree-sitter-hl-face:function.call :foreground fg :weight 'bold) ;; TODO not fix fg here
+   (tree-sitter-hl-face:method.call :foreground fg :weight 'bold) ;; TODO not fix fg here
+   (tree-sitter-hl-face:property :slant 'italic)
+   (tree-sitter-hl-face:number :foreground nano-popout)
+   ((tree-sitter-hl-face:puntuation &override)) ;; TODO its inherinting default causing weird behavior in org-block
+
+   ;; Window divider
+   (window-divider :foreground bg :background bg)
+
+   ;; Parens
+   ((show-paren-match &override) :foreground nano-critical)
+   ((show-paren-missmatch &override) :background nano-critical)
+
+   ;; Others
+   (hl-line :background nano-subtle)
    ((line-number &override) :foreground base3)
    ((line-number-current-line &override) :foreground base2)
    (mode-line
@@ -131,7 +137,7 @@ Can be an integer to determine the exact padding."
    (doom-modeline-bar-inactive :inherit 'doom-modeline-bar)
    (doom-modeline-project-dir :foreground fg)
    (doom-modeline-buffer-file :foreground fg)
-   (doom-modeline-buffer-modified :weight 'bold :foreground "#000000")
+   (doom-modeline-buffer-modified :weight 'bold :foreground fg)
    (doom-modeline-panel :inherit 'mode-line-highlight :background base3 :foreground fg)
    ;;;; ivy
    (ivy-posframe :background bg-alt)
@@ -139,10 +145,12 @@ Can be an integer to determine the exact padding."
    ((magit-diff-added-highlight &override)   :foreground fg :background (doom-blend vc-added bg 0.3))
    ((magit-diff-removed &override)           :foreground (doom-lighten fg 0.4) :background (doom-blend vc-deleted bg 0.1))
    ((magit-diff-removed-highlight &override) :foreground fg :background (doom-blend vc-deleted bg 0.22))
+
    ;;;; lsp-mode
    (lsp-headerline-breadcrumb-symbols-face :foreground keywords :weight 'bold)
+
    ;;;; outline <built-in>
-   (outline-1 :slant 'italic :foreground fg-alt)
+   (outline-1 :weight 'bold :foreground fg-alt)
    (outline-2 :inherit 'outline-1 :foreground base2)
    (outline-3 :inherit 'outline-2)
    (outline-4 :inherit 'outline-3)
@@ -150,17 +158,11 @@ Can be an integer to determine the exact padding."
    (outline-6 :inherit 'outline-5)
    (outline-7 :inherit 'outline-6)
    (outline-8 :inherit 'outline-7)
+
    ;;;; org <built-in>
    ((org-block &override) :background bg-alt)
    ((org-block-begin-line &override) :foreground base5)
-   ;;;; solaire-mode
-   (solaire-mode-line-face
-    :inherit 'mode-line
-    :background modeline-bg-alt
-    :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-alt)))
-   (solaire-mode-line-inactive-face
-    :inherit 'mode-line-inactive
-    :background modeline-bg-inactive-alt
-    :box (if -modeline-pad `(:line-width ,-modeline-pad :color ,modeline-bg-inactive-alt)))))
+   ((org-link &override) :foreground blue)
+   ))
 
-;;; doom-plain-theme.el ends here
+;;; doom-nano-light.el ends here

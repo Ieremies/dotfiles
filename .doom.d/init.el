@@ -84,7 +84,7 @@
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
-       (spell +aspell)     ; tasing you for misspelling mispelling
+       ;;(spell +aspell)     ; tasing you for misspelling mispelling
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
@@ -161,7 +161,7 @@
         +noter
         +roam2
         +present
-        +pretty
+        ;;+pretty
         )
        ;;perl              ; write code no one else can comprehend
        ;;php               ; perl's insecure younger brother
