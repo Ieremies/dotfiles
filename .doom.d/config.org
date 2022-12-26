@@ -75,13 +75,22 @@ Pode ser instalado com ~pip install proselint~ e o flycheck irá automaticamente
 ** TODO [[https://github.com/xenodium/company-org-block][xenodium/company-org-block]]
 ** TODO [[https://github.com/natrys/whisper.el][GitHub - natrys/whisper.el: Speech-to-Text interface for Emacs using OpenAI's...]]
 ** TODO [[https://github.com/magnars/expand-region.el][GitHub - magnars/expand-region.el: Emacs extension to increase selected regio...]]
+** TODO Minimap of context overview
+Seria interessante ter um minimapa contextual. Num arquivo de c, mostrar as funções/classes/variáveis (como o treemacs faz), num arquivo org, mostrar as headlines etc...
+[[https://github.com/knupfer/org-panes/blob/master/org-panes.el][org-panes/org-panes.el at master · knupfer/org-panes · GitHub]]
+** TODO word-counter-goal
+Algo que permita contar a quantidade de palavras adicionadas/removidas num conjunto de arquivos e marcar, na modeline, a sua meta de palavras.
+[[https://github.com/bnbeckwith/wc-goal-mode][GitHub - bnbeckwith/wc-goal-mode: Emacs mode to achieve word-count goals]]
 
+
+** TODO Remove property from deft search
+Most of what is shown in deft is just de properties from a file.
 * General
 #+BEGIN_SRC elisp
 (setq user-full-name "Ieremies Vieira da Fonseca Romero"
       user-mail-address "ieremies@gmail.com"
       doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14)
-      doom-theme 'doom-nord
+      doom-theme 'doom-nano-light
       evil-want-fine-undo t
       ;; performance
       inhibit-compacting-font-caches t
@@ -458,7 +467,7 @@ Using emacs builtin reference managent.
          ))
 #+end_src
 
-**** TODO [[https://github.com/andras-simonyi/org-cite-csl-activate][andras-simonyi/org-cite-csl-activate]]
+**** [[https://github.com/andras-simonyi/org-cite-csl-activate][andras-simonyi/org-cite-csl-activate]]
 #+begin_src elisp :tangle packages.el
 (package! oc-csl-activate
   :recipe(:host github :repo "andras-simonyi/org-cite-csl-activate"))
@@ -469,19 +478,26 @@ Using emacs builtin reference managent.
 (require 'oc-csl-activate)
 (setq org-cite-activate-processor 'csl-activate))
 
-;; BUG isso tem cara de quem deixa as coisas lentas, não?
 (add-hook 'org-mode-hook (lambda () (cursor-sensor-mode 1)))
 #+end_src
 *** [[https://www.orgroam.com/manual.html][Org-roam]]
 #+begin_src elisp
 (after! org-roam
   (setq org-roam-directory "~/org/roam"
+        org-roam-mode-sections (list #'org-roam-backlinks-section
+                                     #'org-roam-reflinks-section
+                                     #'org-roam-unlinked-references-section
+                                     )
         org-roam-capture-templates  '(("d" "default" plain "%?"
                                        :if-new (file+head "${slug}.org"
                                                           "#+title: ${title}\n#+created: %U\n\n%?")
                                        :unnarrowed t))
         ))
 #+end_src
+
+#+RESULTS:
+| d | default | plain | %? | :if-new | (file+head ${slug}.org #+title: ${title} |
+
 **** org-roam-bibtex
 #+begin_src elisp :tangle packages.el
 (package! org-roam-bibtex
@@ -500,12 +516,23 @@ Using emacs builtin reference managent.
   :config
   (org-roam-bibtex-mode)
   (setq orb-roam-ref-format 'org-cite))
+
+(after! org-roam
+  (add-to-list 'org-roam-mode-sections 'orb-section-reference t)
+  (add-to-list 'org-roam-mode-sections 'orb-section-absctract t)
+  (add-to-list 'org-roam-mode-sections 'orb-section-file t)
+  (add-to-list 'org-roam-capture-templates
+               '("r" "bibliography reference" plain
+                  "%?
+%^{author} published %^{entry-type} in %^{date}: fullcite:%\\1."
+                  :target
+                  (file+head "ref/${citekey}.org" "#+title: ${title}\n")
+                  :unnarrowed t))
+  )
 #+end_src
 
-#+RESULTS:
-: t
-
 **** org-roam-ui
+Seems to drain a lot of battery, so I won't turn it on automatically.
 #+begin_src elisp :tangle packages.el
 (package! websocket)
 (package! org-roam-ui)
@@ -515,11 +542,7 @@ Using emacs builtin reference managent.
     :after org-roam)
 
 (use-package! org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
+    :after org-roam
     :config
     (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
@@ -560,6 +583,14 @@ If no files match your search string, pressing RET will create a new file using 
         treemacs-hide-gitignored-files-mode 't
         ))
 #+end_src
+** doom-modeline
+#+begin_src elisp
+(setq doom-modeline-modal nil)
+#+end_src
+
+#+RESULTS:
+: t
+
 * Mine!
 ** KILL Computar effort a partir da quantidade de páginas
 Pontos importantes dessa função:
@@ -642,73 +673,19 @@ Pontos importantes dessa função:
 #+end_src
 * N A N O
 #+begin_src elisp
-(setq default-frame-alist
-      (append (list
-               '(min-height . 1)
-               '(height     . 45)
-               '(min-width  . 1)
-               '(width      . 81)
-               '(vertical-scroll-bars . nil)
-               '(internal-border-width . 24)
-               '(left-fringe    . 1)
-               '(right-fringe   . 1)
-               '(tool-bar-lines . 0)
-               '(menu-bar-lines . 0))))
-
-(setq inhibit-startup-screen 't
-      inhibit-startup-message 't
-      inhibit-startup-echo-area-message 't
-      initial-scratch-message 'nil
-
-      x-underline-at-descent-line 't
-
-      ;; No ugly button for checkboxes
-      widget-image-enable 'nil
-
-      ;; Hide org markup
-      org-hide-emphasis-markers 't
-
-      scroll-bar-mode -1
-
-      ;; Moderate font lock
-      font-lock-maximum-decoration 'nil)
-
-(setq-default line-spacing 1)
-
-;; Minimum window height
-(setq window-min-height 1)
-
-;; Vertical window divider
-(setq window-divider-default-right-width 24
-      window-divider-default-places 'right-only)
-(window-divider-mode 1)
-#+end_src
-#+begin_src elisp
-(setq doom-theme 'plain2)
-
-;;(setq nano-font-size 14)
-
-;; (require 'nano-theme)
-;; (nano-theme)
-;; (after! nano
-;;   (set-face-attribute 'mode-line nil
-;;                       :foreground "#FFFFFF"
-;;                       :underline "#ECEFF1")
-;;   (set-face-attribute 'mode-line-inactive nil
-;;                       :foreground "#FFFFFF"
-;;                       :underline "#ECEFF1")
-;;   )
-(global-hl-line-mode -1)
-(set-face-attribute 'window-divider nil
-                    :foreground (face-attribute 'default :background)
-                    :background (face-attribute 'default :background))
-(set-face-attribute 'font-lock-comment-face nil
-                    :slant 'italic)
+(add-to-list 'load-path "~/proj/doom-nano/")
+(add-to-list 'load-path "~/bin/nano-emacs/")
+(require 'doom-nano-ui)
+;; (require 'doom-nano-faces)
+;; (set-face-attribute 'org-document-title nil
+;;                     :foreground nano-color-salient :weight 'bold)
+;; (set-face-attribute 'org-document-info nil
+;;                     :foreground nano-color-salient)
 
 #+end_src
-
-#+RESULTS:
-
+TODO:
+- Italic
+- font-lock-comment-face :slant italic
 * Modern
 #+begin_src elisp :tangle packages.el
 (package! org-modern
