@@ -1,0 +1,6 @@
+#+filetags: %^{keywords}
+
+* %^{title}
+:PROPERTIES:
+:NOTER_DOCUMENT: %^{file}
+:END:

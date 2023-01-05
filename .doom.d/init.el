@@ -84,7 +84,7 @@
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
-       ;;(spell +aspell)     ; tasing you for misspelling mispelling
+       (spell +hunspell +flyspell)     ; tasing you for misspelling mispelling
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
@@ -158,7 +158,7 @@
        (org                ; organize your plain life in plain text
         +journal
         +dragndrop
-        +noter
+        ;;+noter
         +roam2
         +present
         ;;+pretty

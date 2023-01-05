@@ -16,55 +16,6 @@ Teorema com [nome do teorema na frente] e com o nome do teorema, no latex, em ve
 
 ** TODO org-reveal
 https://www.youtube.com/watch?v=avtiR0AUVlo
-** TODO Sync ref with notes: org-noter
-https://www.youtube.com/watch?v=Un0ZRXTzufo
-
-https://www.youtube.com/watch?v=EjQRqd_3AnA&list=PLR2sw19qWZfuT7_2f66j3PzWa9gbQqx7W&index=10 -> https://github.com/Accacio/dots/blob/master/configs/doom/doom/config.el
-
-https://www.youtube.com/watch?v=lCc3UoQku-E
-https://github.com/yuchen-lea/org-media-note/issues/10
-~org-note-create-skeleton~ org-noter-pdftools-creat-skeleton seems to work better.
-
-#+begin_src elisp :tangle packages.el
-(package! org-noter-pdftools
-  :recipe (:host github :repo "fuxialexander/org-pdftools"))
-(package! org-pdftools
-  :recipe (:host github :repo "fuxialexander/org-pdftools"))
-#+end_src
-
-#+begin_src elisp
-(use-package! org-noter
-  :config
-  (setq
-   org-noter-pdftools-markup-pointer-color "yellow"
-   org-noter-notes-search-path '("~/org/notes/")
-   ;; org-noter-insert-note-no-questions t
-   org-noter-doc-split-fraction '(0.4 . 06)
-   org-noter-always-create-frame nil
-   org-noter-hide-other nil
-   org-noter-pdftools-free-pointer-icon "Note"
-   org-noter-pdftools-free-pointer-color "red"
-   org-noter-kill-frame-at-session-end nil
-   )
-  (map! :map (pdf-view-mode)
-        :leader
-        (:prefix-map ("n" . "notes")
-          :desc "Write notes"                    "w" #'org-noter)
-        )
-  )
-
-(use-package! org-pdftools
-  :hook (org-load . org-pdftools-setup-link))
-
-(use-package! org-noter-pdftools
-  :after org-noter
-  :config
-  (with-eval-after-load 'pdf-annot
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)
-    )
-  )
-#+end_src
-*** TODO https://github.com/yuchen-lea/org-media-note
 ** TODO Forge
 https://magit.vc/manual/forge/
 ** TODO LSP consume muita bateria, talvez TRAMP?
@@ -82,14 +33,44 @@ Seria interessante ter um minimapa contextual. Num arquivo de c, mostrar as fun�
 Algo que permita contar a quantidade de palavras adicionadas/removidas num conjunto de arquivos e marcar, na modeline, a sua meta de palavras.
 [[https://github.com/bnbeckwith/wc-goal-mode][GitHub - bnbeckwith/wc-goal-mode: Emacs mode to achieve word-count goals]]
 
-
 ** TODO Remove property from deft search
 Most of what is shown in deft is just de properties from a file.
+** TODO [[https://github.com/jkitchin/scimax/blob/master/scimax.org][scimax/scimax.org at master · jkitchin/scimax · GitHub]]
+** TODO [[https://github.com/emacs-tw/awesome-emacs][GitHub - emacs-tw/awesome-emacs: A community driven list of useful Emacs pack...]]
+** TODO [[https://karl-voit.at/2020/08/14/project-mgt-draft/][A Draft Workflow for Advanced Project Management Using Org Mode and Org Edna]]
+** TODO [[https://tony-zorman.com/posts/2022-10-22-emacs-potpourri.html][A Potpourri of Emacs Tweaks – Tony Zorman]]
+** TODO [[https://github.com/doomemacs/doomemacs/issues/4413][doomemacs/doomemacs#4413 Module for nano-emacs]]
+** TODO [[https://www.reddit.com/r/emacs/comments/zkb7aq/contextaware_yasnippets_via_treesitter/][Context-aware yasnippets (via tree-sitter) : emacs]]
+** KILL [[https://github.com/bastibe/org-journal][org-journal]]
+CLOSED: [2022-11-17 qui 16:27]
+
+#+begin_src elisp :tangle no
+(setq org-journal-file-type 'weekly ;; a file represents a week
+      org-journal-dir "~/org/journal/"
+      org-journal-file-format "%Y %V - %m %d.org" ;; must contain %Y %m %d when using 'weekly
+      org-extend-today-until 3
+      )
+
+(defun org-journal-find-location ()
+  ;; Open today's journal, but specify a non-nil prefix argument in order to
+  ;; inhibit inserting the heading; org-capture will insert the heading.
+  (org-journal-new-entry t)
+  (unless (eq org-journal-file-type 'daily)
+    (org-narrow-to-subtree))
+  (goto-char (point-max)))
+
+(after! org
+  (map-put! org-capture-templates "j" '("Journal" plain (function org-journal-find-location)
+                                        "** %(format-time-string org-journal-time-format)%^{Title}\n%?"
+                                        :jump-to-captured t :immediate-finish t)))
+#+end_src
+
 * General
 #+BEGIN_SRC elisp
 (setq user-full-name "Ieremies Vieira da Fonseca Romero"
       user-mail-address "ieremies@gmail.com"
       doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14)
+      doom-variable-pitch-font (font-spec :family "Segoe UI Variable Static Text")
       doom-theme 'doom-nano-light
       evil-want-fine-undo t
       ;; performance
@@ -98,7 +79,6 @@ Most of what is shown in deft is just de properties from a file.
       frame-title-format "%f - Emacs"
       )
 #+end_src
-
 #+RESULTS:
 : %f - Emacs
 
@@ -140,16 +120,35 @@ Adicionar os feriados relevantes para mim.
 
 * Checkers
 ** syntax
-** KILL spell - trava obscenamente
-CLOSED: [2022-11-20 dom 13:31]
-Using =spell-fu= and =aspell=.
-#+begin_src elisp :tangle no
-(after! spell-fu
-  (setq ispell-dictionary "pt_BR"))
+** spell
+#+begin_src elisp
+(after! flyspell
+  (setq flyspell-lazy-idle-seconds 2))
+(with-eval-after-load "ispell"
+  ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
+  ;; dictionary' even though multiple dictionaries will be configured
+  ;; in next line.
+  (setenv "LANG" "en_US.UTF-8")
+  (setq ispell-program-name "hunspell")
+  ;; Configure German, Swiss German, and two variants of English.
+  (setq ispell-dictionary "pt_BR,en_US")
+  ;; ispell-set-spellchecker-params has to be called
+  ;; before ispell-hunspell-add-multi-dic will work
+  (ispell-set-spellchecker-params)
+  (ispell-hunspell-add-multi-dic "pt_BR,en_US")
+  ;; For saving words to the personal dictionary, don't infer it from
+  ;; the locale, otherwise it would save to ~/.hunspell_de_DE.
+  (setq ispell-personal-dictionary "~/.hunspell_personal"))
+
+;; The personal dictionary file has to exist, otherwise hunspell will
+;; silently not use it.
+(unless (file-exists-p ispell-personal-dictionary)
+  (write-region "" nil ispell-personal-dictionary nil 0))
 #+end_src
+
+#+RESULTS:
+
 ** grammar
-O módulo de gramática vem com o =writegood-mode=, o que não me é útil.
-*** Language-tool
 Pode ser instalado com ~pacman -S languagetool~
 #+begin_src elisp :tangle packages.el
 (package! languagetool
@@ -157,12 +156,11 @@ Pode ser instalado com ~pacman -S languagetool~
 #+end_src
 #+begin_src elisp
 ;; source : doom's grammar module
-(use-package! langtool
+(use-package! languagetool
   :commands (langtool-check
              langtool-check-done
              langtool-show-message-at-point
              langtool-correct-buffer)
-  :init (setq langtool-default-language "en-US")
   :config
     (setq languagetool-java-arguments '("-Dfile.encoding=UTF-8"
                                     "-cp" "/usr/share/languagetool:/usr/share/java/languagetool/*")
@@ -174,8 +172,10 @@ Pode ser instalado com ~pacman -S languagetool~
 ** Company
 #+begin_src elisp
 (after! company
-  (setq company-idle-delay 0.5))
+  (setq company-idle-delay 0.5
+        company-box-scrollbar nil))
 #+end_src
+
 ** Vertico
 Remove hiden files (dot files) from search.
 #+begin_src elisp
@@ -251,11 +251,12 @@ Está faltando a configuração para pt-br.
  ))
 #+end_src
 
-** Latex exporter
+** Latex
 #+begin_src elisp
 (after! org
-  (setq org-highlight-latex-and-related '(native)))
+  (setq org-highlight-latex-and-related '(native script entities)))
 #+end_src
+
 *** KILL Compiling latex images (org-fragtog)
 Permite que imagens latex sejam autocompiladas e substituidas
 
@@ -429,31 +430,8 @@ Nele, eu quero a agenda do dia e, embaixo, uma lista das tarefas futuras que nã
   (setq org-agenda-cmp-user-defined 'my-cmp-agenda))
 #+end_src
 
-** KILL [[https://github.com/bastibe/org-journal][org-journal]]
-CLOSED: [2022-11-17 qui 16:27]
-
-#+begin_src elisp :tangle no
-(setq org-journal-file-type 'weekly ;; a file represents a week
-      org-journal-dir "~/org/journal/"
-      org-journal-file-format "%Y %V - %m %d.org" ;; must contain %Y %m %d when using 'weekly
-      org-extend-today-until 3
-      )
-
-(defun org-journal-find-location ()
-  ;; Open today's journal, but specify a non-nil prefix argument in order to
-  ;; inhibit inserting the heading; org-capture will insert the heading.
-  (org-journal-new-entry t)
-  (unless (eq org-journal-file-type 'daily)
-    (org-narrow-to-subtree))
-  (goto-char (point-max)))
-
-(after! org
-  (map-put! org-capture-templates "j" '("Journal" plain (function org-journal-find-location)
-                                        "** %(format-time-string org-journal-time-format)%^{Title}\n%?"
-                                        :jump-to-captured t :immediate-finish t)))
-#+end_src
-
 ** Research workflow
+For getting a bibliography, I use Zotero to get the informations and copy over to =~/arq/bib.bib= using Jabref.
 *** [[https://github.com/emacs-citar/citar][citar]]
 Using emacs builtin reference managent.
 #+begin_src elisp
@@ -461,9 +439,8 @@ Using emacs builtin reference managent.
   (setq! citar-bibliography '("~/arq/bib.bib")
          org-cite-global-bibliography '("~/arq/bib.bib")
          citar-notes-paths '("~/org/bib")
-         ;; como eu vou ligar com os pdf e anotações?
-         ;; citar-library-paths '("/path/to/library/files/")
-         ;; citar-notes-paths '("/path/to/your/notes/")
+         citar-library-paths '("~/arq/files/")
+         citar-notes-paths '("~/org/roam/references/")
          ))
 #+end_src
 
@@ -480,7 +457,7 @@ Using emacs builtin reference managent.
 
 (add-hook 'org-mode-hook (lambda () (cursor-sensor-mode 1)))
 #+end_src
-*** [[https://www.orgroam.com/manual.html][Org-roam]]
+*** [[https://www.orgroam.com/manual.html][org-roam]]
 #+begin_src elisp
 (after! org-roam
   (setq org-roam-directory "~/org/roam"
@@ -509,7 +486,7 @@ Using emacs builtin reference managent.
 ;; When using bibtex-completion via the `biblio` module
 (unpin! bibtex-completion helm-bibtex ivy-bibtex)
 #+end_src
-
+[cite:@Malaguti2010SurveyVertexColoring]
 #+begin_src elisp
 (use-package org-roam-bibtex
   :after org-roam
@@ -521,15 +498,18 @@ Using emacs builtin reference managent.
   (add-to-list 'org-roam-mode-sections 'orb-section-reference t)
   (add-to-list 'org-roam-mode-sections 'orb-section-absctract t)
   (add-to-list 'org-roam-mode-sections 'orb-section-file t)
-  (add-to-list 'org-roam-capture-templates
-               '("r" "bibliography reference" plain
-                  "%?
-%^{author} published %^{entry-type} in %^{date}: fullcite:%\\1."
-                  :target
-                  (file+head "ref/${citekey}.org" "#+title: ${title}\n")
-                  :unnarrowed t))
-  )
+  (setq orb-preformat-keywords
+        '("citekey" "title" "url" "author-or-editor" "keywords" "file")
+        orb-process-file-keyword t
+        orb-attached-file-extensions '("pdf"))
+
+  (add-to-list  'org-roam-capture-templates
+                '(("r" "bibliography reference" plain
+                   (file "~.doom.d/template/org-roam-bibtex-noter.org")
+                   :target
+                   (file+head "references/${citekey}.org" "#+title: ${title}\n"))))  )
 #+end_src
+
 
 **** org-roam-ui
 Seems to drain a lot of battery, so I won't turn it on automatically.
@@ -549,6 +529,54 @@ Seems to drain a lot of battery, so I won't turn it on automatically.
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 #+end_src
+*** org-noter
+
+#+begin_src elisp :tangle packages.el
+(package! org-noter
+  :recipe (:host github :repo "dmitrym0/org-noter-plus-djvu"))
+(package! org-noter-pdftools
+  :recipe (:host github :repo "fuxialexander/org-pdftools"))
+(package! org-pdftools
+  :recipe (:host github :repo "fuxialexander/org-pdftools"))
+#+end_src
+
+#+begin_src elisp
+(use-package! org-noter
+  :config
+  (setq
+   org-noter-pdftools-markup-pointer-color "yellow"
+   org-noter-notes-search-path '("~/org/notes/")
+   ;; org-noter-insert-note-no-questions t
+   org-noter-doc-split-fraction '(0.4 . 06)
+   org-noter-always-create-frame nil
+   org-noter-hide-other nil
+   org-noter-pdftools-free-pointer-icon "Note"
+   org-noter-pdftools-free-pointer-color "red"
+   org-noter-kill-frame-at-session-end nil
+   org-noter-auto-save-last-location t
+   org-noter-separate-notes-from-heading t
+   )
+  (map! :map (pdf-view-mode)
+        :leader
+        (:prefix-map ("n" . "notes")
+          :desc "Write notes"                    "w" #'org-noter)
+        )
+  )
+#+end_src
+#+begin_src elisp
+(use-package! org-pdftools
+  :hook (org-load . org-pdftools-setup-link))
+
+(use-package! org-noter-pdftools
+  :after org-noter
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)
+    )
+  )
+#+end_src
+**** TODO https://github.com/yuchen-lea/org-media-note
+
 * lang
 ** latex
 #+BEGIN_SRC elisp
@@ -591,103 +619,97 @@ If no files match your search string, pressing RET will create a new file using 
 #+RESULTS:
 : t
 
-* Mine!
-** KILL Computar effort a partir da quantidade de páginas
-Pontos importantes dessa função:
-=org-map-entries= itera sobre todas as headlines aplicando uma função sobre elas
-=org-entry-put= e =org-entry-get= pega e coloca valores nas propriedades das headlines
-#+begin_src elisp :tangle no
-(defun time-string-to-minutes ( s )
-  "Parse a time string to minutes (number)"
-    (+ (* (nth 2 (parse-time-string s)) 60) (nth 1 (parse-time-string s)))
-    )
-
-(defun get-factor ()
-  "Para cada uma das entradas eu pego o fator de mult por paginas"
-  (interactive)
-  (let (lista)
-    (org-map-entries
-     (lambda ()
-       (org-clock-sum)
-       (push (/ (float (time-string-to-minutes (org-entry-get (point) "CLOCKSUM")))
-                (float (string-to-number (org-entry-get (point) "PAGES"))))
-             lista))
-     "/+DONE" 'tree)
-    (if (/= (length lista) 0)
-        (ceiling (/ (apply '+ lista) (length lista)))
-      (string-to-number (read-from-minibuffer "Enter your factor: "))
-      )
-    )
-  )
-(defun my-effort ()
-  "Para cada uma das headlines, defina EFFORT as FACTOR * PAGES"
-  (interactive)
-  (let ((factor (get-factor)))
-    (org-map-entries
-     (lambda ()
-           (org-entry-put (point) "EFFORT"
-                          (number-to-string (* (string-to-number (org-entry-get (point) "PAGES")) factor)))
-       ) t 'tree)
-  ))
-#+end_src
-** KILL Effort from noter pages
-#+begin_src elisp :tangle no
-(defun my-noter_pages-to-effort ()
-  "Para cada uma das headlines, defina EFFORT as FACTOR * PAGES"
-  (interactive)
-  (org-map-entries
-   (lambda ()
-     (org-forward-heading-same-level 1)
-     (let ((fim (org-entry-get (point) "NOTER_PAGE")))
-       (org-entry-put (point) "PAGES" "0") ;; workaround
-       (org-backward-heading-same-level 1)
-       (org-entry-put (point) "PAGES" (number-to-string(- (string-to-number fim)
-                                                          (string-to-number (org-entry-get (point) "NOTER_PAGE"))))))
-     ) t 'tree)
-  )
-#+end_src
-** KILL Effort from duration
-#+begin_src elisp :tangle no
-(defun my-set-effort-from-appointment ()
-  (interactive)
-  (let ((context (org-element-context)))
-    (when (eq (org-element-type context) 'timestamp)
-      (if (org-element-property :minute-end context)
-      (org-entry-put (point) "EFFORT" (number-to-string(+ (* 60 (-
-                         (org-element-property :hour-end context)
-                         (org-element-property :hour-start context) ))
-                  (-
-                      (org-element-property :minute-end context)
-                      (org-element-property :minute-start context))
-                  ))))
-      )))
-
-
-(defun my-update-effort-from-appointment ()
-  (interactive)
-  (beginning-of-buffer)
-  (while (< (point) (point-max))
-    (my-set-effort-from-appointment)
-    (forward-line)
-   ))
-#+end_src
 * N A N O
-#+begin_src elisp
-(add-to-list 'load-path "~/proj/doom-nano/")
-(add-to-list 'load-path "~/bin/nano-emacs/")
-(require 'doom-nano-ui)
-;; (require 'doom-nano-faces)
-;; (set-face-attribute 'org-document-title nil
-;;                     :foreground nano-color-salient :weight 'bold)
-;; (set-face-attribute 'org-document-info nil
-;;                     :foreground nano-color-salient)
-
+#+begin_src elisp :tangle packages.el
+(package! doom-nano
+  :recipe (:host github :repo "ieremies/doom-nano"))
 #+end_src
-TODO:
-- Italic
-- font-lock-comment-face :slant italic
+
+#+begin_src elisp
+(require 'doom-nano-ui)
+(setq doom-theme 'doom-nano-light) ;; or dark
+#+end_src
+
+#+RESULTS:
+: doom-nano-light
+
+Outras mudanças que eu fiz.
+#+begin_src elisp
+(add-to-list 'load-path "~/bin/nano-emacs/")
+(require 'nano-theme-light)
+(require 'nano-writer)
+(set-face-attribute 'org-document-title nil
+                    :foreground nano-color-salient :weight 'bold)
+(set-face-attribute 'org-document-info nil
+                    :foreground nano-color-salient)
+(set-face-attribute 'org-list-dt nil
+                    :foreground nano-color-salient)
+(set-face-attribute 'org-level-1 nil
+                    :weight 'bold)
+;; (set-face-attribute 'flyspell-incorrect nil
+;;                     :foreground nano-color-foreground
+;;                     :underline `(:style wave :color nano-color-salient))
+;; TODO Changed buffer modeline
+;; TODO Flyspell incorrect
+;; TODO org-link underline
+#+end_src
+
+#+RESULTS:
+
+#+begin_src elisp
+(require 'nano-faces)
+(nano-faces)
+(require 'nano-theme)
+(nano-theme--mode-line)
+(require 'nano-modeline)
+#+end_src
+
+#+RESULTS:
+: nano-modeline
+* scimax
+Documentation: scimax.org
+
+Packages that may be of some interest:
+- org-db.el :: sql database for org-mode files
+  - org-db-fulltext.el
+  - org-db-images.el
+
+- scimax-ob.el :: src edit inspired by jupiter notebook
+  - scimax-ob-flycheck.org
+
+- scimax-org.el :: org-use-speed-commands, org-image-actual-width
+  - scimax-org-attachments.el
+  - scimax-org-babel-python.el
+  - scimax-org-images.el
+  - scimax-org-latex.el
+  - scimax-org-src-blocks.el
+  - scimax-org-table.el
+
+- scimax-yas.el :: snippets
+  - snippets
+
+- scimax.el :: general scimax configuration
+- scimax-autoformat-abbrev.el :: abreviations and auto expansions
+- scimax-build.el :: build org file based on src named "build"
+- scimax-editmarks.org :: [[https://github.com/CriticMarkup/CriticMarkup-toolkit][CriticMarkup]]
+- scimax-functional-text.el :: links to email, hashtags, usernames, commits, pr...
+- scimax-@-links.el :: @ to insert links to convenient things
+- scimax-link-thumbnails.el :: TODO
+- scimax-literate-programming.el ::  TODO
+- scimax-lob.el :: [[https://git.sr.ht/~bzg/worg/tree/master/item/library-of-babel.org][library-of-babel.org]]
+  - scimax-lob
+
+scimax-notebook.org
+subfiles
+help-fns+.el
+words.el
 * Modern
 #+begin_src elisp :tangle packages.el
 (package! org-modern
   :recipe (:host github :repo "minad/org-modern"))
+#+end_src
+* Olivetti
+#+begin_src elisp :tangle packages.el
+(package! olivetti
+  :recipe (:host github :repo "rnkn/olivetti"))
 #+end_src
