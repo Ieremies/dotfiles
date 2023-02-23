@@ -39,9 +39,9 @@
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
        ;;indent-guides     ; highlighted indent columns
-       ligatures      ; ligatures or substitute text with pretty symbols
+       ;;ligatures      ; ligatures or substitute text with pretty symbols
        ;;minimap           ; show a map of the code on the side
-       (modeline +light)          ; snazzy, Atom-inspired modeline, plus API
+       ;;(modeline +light)          ; snazzy, Atom-inspired modeline, plus API
        nav-flash         ; blink cursor line after big motions
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
@@ -84,7 +84,7 @@
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
-       (spell +hunspell +flyspell)     ; tasing you for misspelling mispelling
+       ;;(spell +hunspell +flyspell)     ; tasing you for misspelling mispelling
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
@@ -158,7 +158,7 @@
        (org                ; organize your plain life in plain text
         +journal
         +dragndrop
-        ;;+noter
+        +noter
         +roam2
         +present
         ;;+pretty

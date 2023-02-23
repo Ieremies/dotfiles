@@ -2,11 +2,18 @@
 #+PROPERTY: header-args :tangle config.el
 #+STARTUP: overview
 
+#+begin_src elisp :tangle packages.el
+;; Fix transient bug
+(package! transient :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440")
+(package! with-editor :pin "391e76a256aeec6b9e4cbd733088f30c677d965b")
+#+end_src
 * to be done
 ** TODO [#A] Adicionar linhas após o fim do dia na org-agenda
+** TODO [[https://github.com/yantar92/org-capture-ref][GitHub - yantar92/org-capture-ref: Extract metadata/bibtex info from websites...]]
+** TODO [[https://github.com/cpitclaudel/biblio.el][GitHub - cpitclaudel/biblio.el: Browse and import bibliographic references fr...]]
 ** TODO Rearranjar o org-super-agenda
 *** [ ] Fazer uma subseção com as coisas comcluídas hoje.
-** TODO minted src blocks
+** TODO minted src blocks on latex export
 ** TODO Use =org-special-blocks-extra= [[https://alhassy.github.io/org-special-block-extras/#Equational-Proofs][fonte]]
 Algo parecido com:
 #+begin_theorem [Nome do teorema]
@@ -41,6 +48,14 @@ Most of what is shown in deft is just de properties from a file.
 ** TODO [[https://tony-zorman.com/posts/2022-10-22-emacs-potpourri.html][A Potpourri of Emacs Tweaks – Tony Zorman]]
 ** TODO [[https://github.com/doomemacs/doomemacs/issues/4413][doomemacs/doomemacs#4413 Module for nano-emacs]]
 ** TODO [[https://www.reddit.com/r/emacs/comments/zkb7aq/contextaware_yasnippets_via_treesitter/][Context-aware yasnippets (via tree-sitter) : emacs]]
+** TODO https://orgmode.org/worg/exporters/anno-bib-template-worg.html
+** TODO expandir sse para "se, e somente se, "
+
+[[file:~/org/roam/references/Malaguti2010SurveyVertexColoring.org::*Branch and price][Branch and price]]
+** TODO https://github.com/howardabrams/hamacs
+** TODO https://github.com/mickeynp/combobulate
+** TODO https://www.reddit.com/r/emacs/comments/10rsxty/treesitauto_03_now_with_automatic_installation_of/
+** TODO https://github.com/fbkarsdorp/org-agenda-dashboard
 ** KILL [[https://github.com/bastibe/org-journal][org-journal]]
 CLOSED: [2022-11-17 qui 16:27]
 
@@ -65,12 +80,50 @@ CLOSED: [2022-11-17 qui 16:27]
                                         :jump-to-captured t :immediate-finish t)))
 #+end_src
 
+** TODO https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
+** scimax
+Documentation: scimax.org
+
+Packages that may be of some interest:
+- org-db.el :: sql database for org-mode files
+  - org-db-fulltext.el
+  - org-db-images.el
+
+- scimax-ob.el :: src edit inspired by jupiter notebook
+  - scimax-ob-flycheck.org
+
+- scimax-org.el :: org-use-speed-commands, org-image-actual-width
+  - scimax-org-attachments.el
+  - scimax-org-babel-python.el
+  - scimax-org-images.el
+  - scimax-org-latex.el
+  - scimax-org-src-blocks.el
+  - scimax-org-table.el
+
+- scimax-yas.el :: snippets
+  - snippets
+
+- scimax.el :: general scimax configuration
+- scimax-autoformat-abbrev.el :: abreviations and auto expansions
+- scimax-build.el :: build org file based on src named "build"
+- scimax-editmarks.org :: [[https://github.com/CriticMarkup/CriticMarkup-toolkit][CriticMarkup]]
+- scimax-functional-text.el :: links to email, hashtags, usernames, commits, pr...
+- scimax-@-links.el :: @ to insert links to convenient things
+- scimax-link-thumbnails.el :: TODO
+- scimax-literate-programming.el ::  TODO
+- scimax-lob.el :: [[https://git.sr.ht/~bzg/worg/tree/master/item/library-of-babel.org][library-of-babel.org]]
+  - scimax-lob
+
+scimax-notebook.org
+subfiles
+help-fns+.el
+words.el
 * General
 #+BEGIN_SRC elisp
 (setq user-full-name "Ieremies Vieira da Fonseca Romero"
       user-mail-address "ieremies@gmail.com"
       doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14)
-      doom-variable-pitch-font (font-spec :family "Segoe UI Variable Static Text")
+      ;; doom-variable-pitch-font (font-spec :family "Segoe UI Variable Static Text")
       doom-theme 'doom-nano-light
       evil-want-fine-undo t
       ;; performance
@@ -79,8 +132,6 @@ CLOSED: [2022-11-17 qui 16:27]
       frame-title-format "%f - Emacs"
       )
 #+end_src
-#+RESULTS:
-: %f - Emacs
 
 ** Center search result
 #+begin_src elisp
@@ -90,10 +141,11 @@ CLOSED: [2022-11-17 qui 16:27]
             (lambda (&rest x) (evil-scroll-line-to-center (line-number-at-pos))))
 #+end_src
 
+#+RESULTS:
+
 * App
 ** calendar
-Adicionar os feriados relevantes para mim.
-#+begin_src elisp :results silent
+#+begin_src elisp
 (after! calf-org
 (setq cfw:org-overwrite-default-keybinding t
       calendar-holidays '((holiday-fixed 1 1   "Ano novo")
@@ -121,9 +173,10 @@ Adicionar os feriados relevantes para mim.
 * Checkers
 ** syntax
 ** spell
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (after! flyspell
   (setq flyspell-lazy-idle-seconds 2))
+
 (with-eval-after-load "ispell"
   ;; Configure `LANG`, otherwise ispell.el cannot find a 'default
   ;; dictionary' even though multiple dictionaries will be configured
@@ -145,8 +198,6 @@ Adicionar os feriados relevantes para mim.
 (unless (file-exists-p ispell-personal-dictionary)
   (write-region "" nil ispell-personal-dictionary nil 0))
 #+end_src
-
-#+RESULTS:
 
 ** grammar
 Pode ser instalado com ~pacman -S languagetool~
@@ -198,7 +249,6 @@ dot."
 
 #+end_src
 
-* editor
 * emacs
 ** Dired
 #+begin_src elisp
@@ -216,7 +266,6 @@ dot."
         (dired-hide-details-mode)))
   )
 #+end_src
-*** TODO https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
 * org
 ** General config
 #+begin_src elisp
@@ -251,25 +300,36 @@ Está faltando a configuração para pt-br.
  ))
 #+end_src
 
-** Latex
+** Latex export
 #+begin_src elisp
 (after! org
   (setq org-highlight-latex-and-related '(native script entities)))
 #+end_src
 
-*** KILL Compiling latex images (org-fragtog)
-Permite que imagens latex sejam autocompiladas e substituidas
+All exports places under a folder called build
+#+begin_src elisp
+(defadvice org-export-output-file-name (before org-add-export-dir activate)
+  "Modifies org-export to place exported files in a different directory"
+  (when (not pub-dir)
+      (setq pub-dir "build")
+      (when (not (file-directory-p pub-dir))
+       (make-directory pub-dir))))
+#+end_src
 
+#+RESULTS:
+: org-export-output-file-name
+
+*** org-fragtog
+Allows latex fragments to be automatically previewed.
 #+BEGIN_SRC elisp :tangle packages.el
 (package! org-fragtog)
 #+END_SRC
-
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC elisp
 (add-hook 'org-mode-hook 'org-fragtog-mode)
 #+END_SRC
 *** Centering latex preview fragments
-Código retirado de [[https://github.com/jkitchin/scimax][scimax]] para centralizar os preview de latex.
-Também conferir [[https://kitchingroup.cheme.cmu.edu/blog/category/orgmode/4/][eq]] para corrigir o número de equações.
+Code extracted from [[https://github.com/jkitchin/scimax][scimax]] to center latex previews.
+Also, check out [[https://kitchingroup.cheme.cmu.edu/blog/category/orgmode/4/][eq]] to fix equation numbers.
 
 #+begin_src elisp :tangle packages.el
 (package! ov
@@ -430,9 +490,43 @@ Nele, eu quero a agenda do dia e, embaixo, uma lista das tarefas futuras que nã
   (setq org-agenda-cmp-user-defined 'my-cmp-agenda))
 #+end_src
 
-** Research workflow
+* lang
+** latex
+#+BEGIN_SRC elisp
+(setq +latex-viewers '(zathura))
+#+END_SRC
+* tools
+* ui
+** [[https://github.com/jrblevin/deft][deft]]
+If no files match your search string, pressing RET will create a new file using the string as the title. But I am not sure if this will conflict with =org-roam=
+#+begin_src elisp
+(after! deft
+  (setq deft-directory "~/org/"
+        deft-extensions '("org","txt")
+        deft-recursive t))
+#+end_src
+** ophints
+#+begin_src elisp
+(after! evil-goggles
+  (evil-goggles-mode)
+  (evil-goggles-use-diff-faces))
+#+end_src
+** treemacs
+#+begin_src elisp
+(after! treemacs
+  (setq treemacs-width 25
+        treemacs-show-hidden-files 'nil
+        treemacs-hide-gitignored-files-mode 't
+        treemacs-user-mode-line-format "" ;; test to fix bug
+        ))
+#+end_src
+** doom-modeline
+#+begin_src elisp
+(setq doom-modeline-modal nil)
+#+end_src
+* Research workflow
 For getting a bibliography, I use Zotero to get the informations and copy over to =~/arq/bib.bib= using Jabref.
-*** [[https://github.com/emacs-citar/citar][citar]]
+** [[https://github.com/emacs-citar/citar][citar]]
 Using emacs builtin reference managent.
 #+begin_src elisp
 (after! citar
@@ -441,10 +535,14 @@ Using emacs builtin reference managent.
          citar-notes-paths '("~/org/bib")
          citar-library-paths '("~/arq/files/")
          citar-notes-paths '("~/org/roam/references/")
-         ))
+         )
+  (map! :after org-mode
+        :map org-mode-map
+        :desc "Insert citation" :i "C-a" #'org-cite-insert)
+        )
 #+end_src
 
-**** [[https://github.com/andras-simonyi/org-cite-csl-activate][andras-simonyi/org-cite-csl-activate]]
+*** [[https://github.com/andras-simonyi/org-cite-csl-activate][andras-simonyi/org-cite-csl-activate]]
 #+begin_src elisp :tangle packages.el
 (package! oc-csl-activate
   :recipe(:host github :repo "andras-simonyi/org-cite-csl-activate"))
@@ -457,7 +555,15 @@ Using emacs builtin reference managent.
 
 (add-hook 'org-mode-hook (lambda () (cursor-sensor-mode 1)))
 #+end_src
-*** [[https://www.orgroam.com/manual.html][org-roam]]
+** org-ref (only for labels)
+#+begin_src elisp :tangle packages.el
+(package! org-ref)
+#+end_src
+#+begin_src elisp
+(use-package! org-ref
+  :init (setq org-latex-prefer-user-labels t))
+#+end_src
+** [[https://www.orgroam.com/manual.html][org-roam]]
 #+begin_src elisp
 (after! org-roam
   (setq org-roam-directory "~/org/roam"
@@ -471,20 +577,10 @@ Using emacs builtin reference managent.
                                        :unnarrowed t))
         ))
 #+end_src
-
-#+RESULTS:
-| d | default | plain | %? | :if-new | (file+head ${slug}.org #+title: ${title} |
-
-**** org-roam-bibtex
+*** org-roam-bibtex
 #+begin_src elisp :tangle packages.el
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
-
-;; When using org-roam via the `+roam` flag
-(unpin! org-roam)
-
-;; When using bibtex-completion via the `biblio` module
-(unpin! bibtex-completion helm-bibtex ivy-bibtex)
 #+end_src
 [cite:@Malaguti2010SurveyVertexColoring]
 #+begin_src elisp
@@ -509,9 +605,7 @@ Using emacs builtin reference managent.
                    :target
                    (file+head "references/${citekey}.org" "#+title: ${title}\n"))))  )
 #+end_src
-
-
-**** org-roam-ui
+*** org-roam-ui
 Seems to drain a lot of battery, so I won't turn it on automatically.
 #+begin_src elisp :tangle packages.el
 (package! websocket)
@@ -529,11 +623,11 @@ Seems to drain a lot of battery, so I won't turn it on automatically.
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 #+end_src
-*** org-noter
+** org-noter
 
 #+begin_src elisp :tangle packages.el
-(package! org-noter
-  :recipe (:host github :repo "dmitrym0/org-noter-plus-djvu"))
+;; (package! org-noter
+;;   :recipe (:host github :repo "dmitrym0/org-noter-plus-djvu"))
 (package! org-noter-pdftools
   :recipe (:host github :repo "fuxialexander/org-pdftools"))
 (package! org-pdftools
@@ -575,56 +669,13 @@ Seems to drain a lot of battery, so I won't turn it on automatically.
     )
   )
 #+end_src
-**** TODO https://github.com/yuchen-lea/org-media-note
+*** TODO https://github.com/yuchen-lea/org-media-note
 
-* lang
-** latex
-#+BEGIN_SRC elisp
-(setq +latex-viewers '(zathura))
-#+END_SRC
-* tools
-* ui
-** [[https://github.com/jrblevin/deft][deft]]
-If no files match your search string, pressing RET will create a new file using the string as the title. But I am not sure if this will conflict with =org-roam=
-#+begin_src elisp
-(after! deft
-  (setq deft-directory "~/org/"
-        deft-extensions '("org","txt")
-        deft-recursive t))
-#+end_src
-** ophints
-#+begin_src elisp
-(after! evil-goggles
-  (evil-goggles-mode)
-
-  ;; optionally use diff-mode's faces; as a result, deleted text
-  ;; will be highlighed with `diff-removed` face which is typically
-  ;; some red color (as defined by the color theme)
-  ;; other faces such as `diff-added` will be used for other actions
-  (evil-goggles-use-diff-faces))
-#+end_src
-** treemacs
-#+begin_src elisp
-(after! treemacs
-  (setq treemacs-width 25
-        treemacs-show-hidden-files 'nil
-        treemacs-hide-gitignored-files-mode 't
-        ))
-#+end_src
-** doom-modeline
-#+begin_src elisp
-(setq doom-modeline-modal nil)
-#+end_src
-
-#+RESULTS:
-: t
-
-* N A N O
+* nano
 #+begin_src elisp :tangle packages.el
 (package! doom-nano
   :recipe (:host github :repo "ieremies/doom-nano"))
 #+end_src
-
 #+begin_src elisp
 (require 'doom-nano-ui)
 (setq doom-theme 'doom-nano-light) ;; or dark
@@ -634,10 +685,16 @@ If no files match your search string, pressing RET will create a new file using 
 : doom-nano-light
 
 Outras mudanças que eu fiz.
-#+begin_src elisp
+#+begin_src elisp :results silent
 (add-to-list 'load-path "~/bin/nano-emacs/")
 (require 'nano-theme-light)
-(require 'nano-writer)
+(require 'nano-faces)
+(nano-faces)
+(require 'nano-theme)
+(nano-theme--mode-line)
+(require 'nano-modeline)
+
+;; Personal changes
 (set-face-attribute 'org-document-title nil
                     :foreground nano-color-salient :weight 'bold)
 (set-face-attribute 'org-document-info nil
@@ -654,62 +711,3 @@ Outras mudanças que eu fiz.
 ;; TODO org-link underline
 #+end_src
 
-#+RESULTS:
-
-#+begin_src elisp
-(require 'nano-faces)
-(nano-faces)
-(require 'nano-theme)
-(nano-theme--mode-line)
-(require 'nano-modeline)
-#+end_src
-
-#+RESULTS:
-: nano-modeline
-* scimax
-Documentation: scimax.org
-
-Packages that may be of some interest:
-- org-db.el :: sql database for org-mode files
-  - org-db-fulltext.el
-  - org-db-images.el
-
-- scimax-ob.el :: src edit inspired by jupiter notebook
-  - scimax-ob-flycheck.org
-
-- scimax-org.el :: org-use-speed-commands, org-image-actual-width
-  - scimax-org-attachments.el
-  - scimax-org-babel-python.el
-  - scimax-org-images.el
-  - scimax-org-latex.el
-  - scimax-org-src-blocks.el
-  - scimax-org-table.el
-
-- scimax-yas.el :: snippets
-  - snippets
-
-- scimax.el :: general scimax configuration
-- scimax-autoformat-abbrev.el :: abreviations and auto expansions
-- scimax-build.el :: build org file based on src named "build"
-- scimax-editmarks.org :: [[https://github.com/CriticMarkup/CriticMarkup-toolkit][CriticMarkup]]
-- scimax-functional-text.el :: links to email, hashtags, usernames, commits, pr...
-- scimax-@-links.el :: @ to insert links to convenient things
-- scimax-link-thumbnails.el :: TODO
-- scimax-literate-programming.el ::  TODO
-- scimax-lob.el :: [[https://git.sr.ht/~bzg/worg/tree/master/item/library-of-babel.org][library-of-babel.org]]
-  - scimax-lob
-
-scimax-notebook.org
-subfiles
-help-fns+.el
-words.el
-* Modern
-#+begin_src elisp :tangle packages.el
-(package! org-modern
-  :recipe (:host github :repo "minad/org-modern"))
-#+end_src
-* Olivetti
-#+begin_src elisp :tangle packages.el
-(package! olivetti
-  :recipe (:host github :repo "rnkn/olivetti"))
-#+end_src
