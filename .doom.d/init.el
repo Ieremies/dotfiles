@@ -98,10 +98,10 @@
        (eval +overlay)     ; run code, run (also, repls)
        ;;gist              ; interacting with github gists
        lookup              ; navigate your code and its documentation
-       ;;(lsp +eglot +peek)
+       (lsp +eglot)
        ;;macos             ; MacOS-specific commands
-       (magit             ; a git porcelain for Emacs
-        +forge)
+       magit             ; a git porcelain for Emacs
+       ;; +forge)
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
        pdf               ; pdf enhancements
@@ -116,7 +116,7 @@
        :lang
        ;;agda              ; types of types of types of types...
        (cc                ; C/C++/Obj-C madness
-        ;;+lsp
+        +lsp
         +tree-sitter)
        ;;clojure           ; java with a lisp
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
@@ -195,7 +195,7 @@
        :app
        calendar
        ;;irc               ; how neckbeards socialize
-       ;;(rss +org)        ; emacs as an RSS reader
+       (rss +org)        ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 
        :config

@@ -7,81 +7,72 @@
 (package! transient :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440")
 (package! with-editor :pin "391e76a256aeec6b9e4cbd733088f30c677d965b")
 #+end_src
+
 * to be done
-** TODO [#A] Adicionar linhas após o fim do dia na org-agenda
-** TODO [[https://github.com/yantar92/org-capture-ref][GitHub - yantar92/org-capture-ref: Extract metadata/bibtex info from websites...]]
-** TODO [[https://github.com/cpitclaudel/biblio.el][GitHub - cpitclaudel/biblio.el: Browse and import bibliographic references fr...]]
-** TODO Rearranjar o org-super-agenda
-*** [ ] Fazer uma subseção com as coisas comcluídas hoje.
-** TODO minted src blocks on latex export
-** TODO Use =org-special-blocks-extra= [[https://alhassy.github.io/org-special-block-extras/#Equational-Proofs][fonte]]
+Conferir os saved do reddit!
+** Agenda
+*** TODO Adicionar linhas após o fim do dia na org-agenda
+*** TODO Rearranjar o org-super-agenda
+**** [ ] Fazer uma subseção com as coisas comcluídas hoje.
+*** TODO https://github.com/fbkarsdorp/org-agenda-dashboard
+** latex export
+*** TODO minted src blocks on latex export
+*** TODO Use =org-special-blocks-extra=
+[[https://alhassy.github.io/org-special-block-extras/#Equational-Proofs][fonte]]
 Algo parecido com:
 #+begin_theorem [Nome do teorema]
 Teorema com [nome do teorema na frente] e com o nome do teorema, no latex, em verde, que nem o #+title
 #+end_theorem
-** TODO Permitir que o spell check cheque para pt e en ao mesmo tempo
-
-** TODO org-reveal
-https://www.youtube.com/watch?v=avtiR0AUVlo
-** TODO Forge
+** magit +forge
+Está travando alguma coisa.
 https://magit.vc/manual/forge/
-** TODO LSP consume muita bateria, talvez TRAMP?
-** TODO Quando eu digitar $, automaticamente colocar $$ e o cursor no meio.
-** TODO Proselint
-[[https://github.com/amperser/proselint][GitHub - amperser/proselint: A linter for prose.]]
-Pode ser instalado com ~pip install proselint~ e o flycheck irá automaticamente usá-lo
-** TODO [[https://github.com/xenodium/company-org-block][xenodium/company-org-block]]
-** TODO [[https://github.com/natrys/whisper.el][GitHub - natrys/whisper.el: Speech-to-Text interface for Emacs using OpenAI's...]]
-** TODO [[https://github.com/magnars/expand-region.el][GitHub - magnars/expand-region.el: Emacs extension to increase selected regio...]]
-** TODO Minimap of context overview
+** Text editing
+*** TODO Quando eu digitar $, automaticamente colocar $$ e o cursor no meio.
+*** TODO expandir sse para "se, e somente se, "
+*** TODO [[https://github.com/xenodium/company-org-block][xenodium/company-org-block]]
+*** TODO [[https://github.com/magnars/expand-region.el][GitHub - magnars/expand-region.el: Emacs extension to increase selected regio...]]
+*** TODO https://github.com/mickeynp/combobulate
+** AI
+https://github.com/ggerganov/whisper.cpp
+https://github.com/nsarrazin/serge
+*** TODO [[https://github.com/natrys/whisper.el][GitHub - natrys/whisper.el: Speech-to-Text interface for Emacs using OpenAI's...]]
+*** chatGPT in emacs
+[[https://www.reddit.com/r/emacs/comments/11k1q0s/comment/jb64sgc/?utm_source=share&utm_medium=web2x&context=3][List of AI assisted in emacs]] (last seen 27/03)
+It would be nice to have completion for org files.
+Maybe aware of my notes?
+
+- [[https://github.com/rksm/org-ai][rksm/org-ai]] :: chatgpt and dall-e in org-blocks. Usefull for creating images in texts.
+- [[https://github.com/joshcho/ChatGPT.el][joshcho/ChatGPT.el]] :: chatgpt with user predefined prompts
+- [[https://github.com/karthink/gptel][karthink/gptel]] :: seems to have the same functionallity of the others, but with a menu.
+- [[https://github.com/debanjum/khoj][debanjum/khoj.]] :: chatgpt aware of your notes.
+
+**** [[https://github.com/xenodium/chatgpt-shell][xenodium/chatgpt-shell]] :: chatgpt and dall-e shell only
+#+begin_src elisp :tangle packages.el
+(package! chatgpt-shell
+  :recipe (:host github :repo "xenodium/chatgpt-shell"))
+#+end_src
+#+begin_src elisp
+(setq chatgpt-shell-openai-key "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")
+#+end_src
+Invoke by calling =chatgpt-shell= or =dall-e-shell=
+
+** Outros
+Coisas sem uma categoria boa
+*** TODO Minimap of context overview
 Seria interessante ter um minimapa contextual. Num arquivo de c, mostrar as funções/classes/variáveis (como o treemacs faz), num arquivo org, mostrar as headlines etc...
 [[https://github.com/knupfer/org-panes/blob/master/org-panes.el][org-panes/org-panes.el at master · knupfer/org-panes · GitHub]]
-** TODO word-counter-goal
+*** https://github.com/mclear-tools/consult-notes
+Me parece uma alternativa ao deft
+*** TODO word-counter-goal
 Algo que permita contar a quantidade de palavras adicionadas/removidas num conjunto de arquivos e marcar, na modeline, a sua meta de palavras.
 [[https://github.com/bnbeckwith/wc-goal-mode][GitHub - bnbeckwith/wc-goal-mode: Emacs mode to achieve word-count goals]]
 
-** TODO Remove property from deft search
+*** TODO Remove property from deft search
 Most of what is shown in deft is just de properties from a file.
-** TODO [[https://github.com/jkitchin/scimax/blob/master/scimax.org][scimax/scimax.org at master · jkitchin/scimax · GitHub]]
-** TODO [[https://github.com/emacs-tw/awesome-emacs][GitHub - emacs-tw/awesome-emacs: A community driven list of useful Emacs pack...]]
-** TODO [[https://karl-voit.at/2020/08/14/project-mgt-draft/][A Draft Workflow for Advanced Project Management Using Org Mode and Org Edna]]
-** TODO [[https://tony-zorman.com/posts/2022-10-22-emacs-potpourri.html][A Potpourri of Emacs Tweaks – Tony Zorman]]
-** TODO [[https://github.com/doomemacs/doomemacs/issues/4413][doomemacs/doomemacs#4413 Module for nano-emacs]]
-** TODO [[https://www.reddit.com/r/emacs/comments/zkb7aq/contextaware_yasnippets_via_treesitter/][Context-aware yasnippets (via tree-sitter) : emacs]]
-** TODO https://orgmode.org/worg/exporters/anno-bib-template-worg.html
-** TODO expandir sse para "se, e somente se, "
-
-[[file:~/org/roam/references/Malaguti2010SurveyVertexColoring.org::*Branch and price][Branch and price]]
-** TODO https://github.com/howardabrams/hamacs
-** TODO https://github.com/mickeynp/combobulate
-** TODO https://www.reddit.com/r/emacs/comments/10rsxty/treesitauto_03_now_with_automatic_installation_of/
-** TODO https://github.com/fbkarsdorp/org-agenda-dashboard
-** KILL [[https://github.com/bastibe/org-journal][org-journal]]
-CLOSED: [2022-11-17 qui 16:27]
-
-#+begin_src elisp :tangle no
-(setq org-journal-file-type 'weekly ;; a file represents a week
-      org-journal-dir "~/org/journal/"
-      org-journal-file-format "%Y %V - %m %d.org" ;; must contain %Y %m %d when using 'weekly
-      org-extend-today-until 3
-      )
-
-(defun org-journal-find-location ()
-  ;; Open today's journal, but specify a non-nil prefix argument in order to
-  ;; inhibit inserting the heading; org-capture will insert the heading.
-  (org-journal-new-entry t)
-  (unless (eq org-journal-file-type 'daily)
-    (org-narrow-to-subtree))
-  (goto-char (point-max)))
-
-(after! org
-  (map-put! org-capture-templates "j" '("Journal" plain (function org-journal-find-location)
-                                        "** %(format-time-string org-journal-time-format)%^{Title}\n%?"
-                                        :jump-to-captured t :immediate-finish t)))
-#+end_src
-
-** TODO https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
-** scimax
+*** TODO https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
+** Inspirações
+Lista de coisas que pode ser útil tirar algo, mas nada específico ainda
+*** scimax
 Documentation: scimax.org
 
 Packages that may be of some interest:
@@ -118,6 +109,39 @@ scimax-notebook.org
 subfiles
 help-fns+.el
 words.el
+*** https://github.com/jethrokuan/braindump
+*** TODO [[https://github.com/emacs-tw/awesome-emacs][GitHub - emacs-tw/awesome-emacs: A community driven list of useful Emacs pack...]]
+*** TODO [[https://karl-voit.at/2020/08/14/project-mgt-draft/][A Draft Workflow for Advanced Project Management Using Org Mode and Org Edna]]
+*** TODO [[https://tony-zorman.com/posts/2022-10-22-emacs-potpourri.html][A Potpourri of Emacs Tweaks – Tony Zorman]]
+*** TODO https://github.com/howardabrams/hamacs
+** Tree sitter
+Dependente de atualizar para o emacs 29
+*** TODO [[https://www.reddit.com/r/emacs/comments/zkb7aq/contextaware_yasnippets_via_treesitter/][Context-aware yasnippets (via tree-sitter) : emacs]]
+*** TODO https://www.reddit.com/r/emacs/comments/10rsxty/treesitauto_03_now_with_automatic_installation_of/
+** KILL [[https://github.com/bastibe/org-journal][org-journal]]
+CLOSED: [2022-11-17 qui 16:27]
+
+#+begin_src elisp :tangle no
+(setq org-journal-file-type 'weekly ;; a file represents a week
+      org-journal-dir "~/org/journal/"
+      org-journal-file-format "%Y %V - %m %d.org" ;; must contain %Y %m %d when using 'weekly
+      org-extend-today-until 3
+      )
+
+(defun org-journal-find-location ()
+  ;; Open today's journal, but specify a non-nil prefix argument in order to
+  ;; inhibit inserting the heading; org-capture will insert the heading.
+  (org-journal-new-entry t)
+  (unless (eq org-journal-file-type 'daily)
+    (org-narrow-to-subtree))
+  (goto-char (point-max)))
+
+(after! org
+  (map-put! org-capture-templates "j" '("Journal" plain (function org-journal-find-location)
+                                        "** %(format-time-string org-journal-time-format)%^{Title}\n%?"
+                                        :jump-to-captured t :immediate-finish t)))
+#+end_src
+
 * General
 #+BEGIN_SRC elisp
 (setq user-full-name "Ieremies Vieira da Fonseca Romero"
@@ -173,6 +197,12 @@ words.el
 * Checkers
 ** syntax
 ** spell
+*** Jinx
+#+begin_src elisp :tangle packages.el
+(package! jinx
+  :recipe (:host github :repo "minad/jinx"))
+#+end_src
+*** Doom default
 #+begin_src elisp :tangle no
 (after! flyspell
   (setq flyspell-lazy-idle-seconds 2))
@@ -218,7 +248,9 @@ Pode ser instalado com ~pacman -S languagetool~
       languagetool-console-command "org.languagetool.commandline.Main"
       languagetool-server-command "org.languagetool.server.HTTPServer"))
 #+end_src
-
+** proselint
+Just need to be installed (using pip) and flyspell will use it.
+Althought it is only available for english.
 * Completion
 ** Company
 #+begin_src elisp
@@ -266,6 +298,11 @@ dot."
         (dired-hide-details-mode)))
   )
 #+end_src
+** Stickymode
+#+begin_src elisp :tangle packages.el
+(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
+(semantic-mode 1)
+(require 'stickyfunc-enhance)#+end_src
 * org
 ** General config
 #+begin_src elisp
@@ -283,7 +320,12 @@ dot."
                 ;; switching capture with scratch
                 :desc "Org capture"    "x"#'org-capture
                 :desc "Scratch buffer" "X"#'doom/open-scratch-buffer)
+  (add-hook 'org-mode-hook 'mixed-pitch-mode)
   )
+#+end_src
+*** org-sidebar
+#+begin_src elisp :tangle packages.el
+(package! org-sidebar)
 #+end_src
 
 ** Smart quotes
@@ -315,10 +357,6 @@ All exports places under a folder called build
       (when (not (file-directory-p pub-dir))
        (make-directory pub-dir))))
 #+end_src
-
-#+RESULTS:
-: org-export-output-file-name
-
 *** org-fragtog
 Allows latex fragments to be automatically previewed.
 #+BEGIN_SRC elisp :tangle packages.el
@@ -395,9 +433,21 @@ JUSTIFICATION is a symbol for 'left, 'center or 'right."
 #+begin_src elisp
 (after! org
   (add-to-list 'org-latex-packages-alist '("" "amsthm" t))
-  (add-to-list 'org-latex-packages-alist '("AUTO" "babel" t))
-  (add-to-list 'org-latex-packages-alist '("" "todonotes" t))  )
+  (add-to-list 'org-latex-packages-alist '("brazil" "babel" t))
+  (add-to-list 'org-latex-packages-alist '("" "todonotes" t))
+  (setq org-cite-biblatex-options "date=year")
+)
 #+end_src
+*** minted source blocks
+Since my output directory is different from source, I must add the ="outputdir=build"= to minted's options. [[https://github.com/gpoore/minted/issues/159][source]]
+#+begin_src elisp :tangle no
+(after! org
+(add-to-list 'org-latex-packages-alist '("outpudir=build" "minted"))
+(setq org-latex-listings 'minted))
+#+end_src
+
+#+RESULTS:
+: minted
 
 ** Agenda
 #+begin_src elisp
@@ -495,7 +545,46 @@ Nele, eu quero a agenda do dia e, embaixo, uma lista das tarefas futuras que nã
 #+BEGIN_SRC elisp
 (setq +latex-viewers '(zathura))
 #+END_SRC
+** docstr
+Pacote para ajudar a colocar documentação.
+#+begin_src elisp :tangle packages.el
+(package! docstr
+  :recipe (:host github :repo "emacs-vs/docstr"))
+#+end_src
+** copilot.el
+#+begin_src elisp :tangle packages.el
+(package! copilot
+  :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+#+end_src
+
+#+begin_src elisp
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
+         ("C-<tab>" . 'copilot-accept-completion-by-word)
+         :map copilot-completion-map
+         ("<tab>" . 'copilot-accept-completion)
+         ("TAB" . 'copilot-accept-completion)))
+#+end_src
 * tools
+** Elfeed
+Filter reddit posts based on the number of upvotes.
+#+begin_src elisp
+(defun elfeed-reddit-filter (entry)
+  "Filter out Reddit entries based on the number of upvotes."
+  (let ((upvotes (elfeed-meta entry :reddit-score)))
+    (if (or (null upvotes)
+            (>= upvotes 10))
+        entry
+      nil)))
+
+(setq-default elfeed-search-filter 'elfeed-reddit-filter)
+#+end_src
+
+#+RESULTS:
+: elfeed-reddit-filter
+
 * ui
 ** [[https://github.com/jrblevin/deft][deft]]
 If no files match your search string, pressing RET will create a new file using the string as the title. But I am not sure if this will conflict with =org-roam=
@@ -582,7 +671,7 @@ Using emacs builtin reference managent.
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 #+end_src
-[cite:@Malaguti2010SurveyVertexColoring]
+
 #+begin_src elisp
 (use-package org-roam-bibtex
   :after org-roam
@@ -600,10 +689,12 @@ Using emacs builtin reference managent.
         orb-attached-file-extensions '("pdf"))
 
   (add-to-list  'org-roam-capture-templates
-                '(("r" "bibliography reference" plain
+                '("r" "bibliography reference" plain
                    (file "~.doom.d/template/org-roam-bibtex-noter.org")
                    :target
-                   (file+head "references/${citekey}.org" "#+title: ${title}\n"))))  )
+                   (file+head "references/${citekey}.org" "#+title: ${title}\n"))
+                )
+  )
 #+end_src
 *** org-roam-ui
 Seems to drain a lot of battery, so I won't turn it on automatically.
@@ -657,6 +748,10 @@ Seems to drain a lot of battery, so I won't turn it on automatically.
         )
   )
 #+end_src
+
+#+RESULTS:
+: t
+
 #+begin_src elisp
 (use-package! org-pdftools
   :hook (org-load . org-pdftools-setup-link))
@@ -672,20 +767,18 @@ Seems to drain a lot of battery, so I won't turn it on automatically.
 *** TODO https://github.com/yuchen-lea/org-media-note
 
 * nano
+** My nano
 #+begin_src elisp :tangle packages.el
 (package! doom-nano
   :recipe (:host github :repo "ieremies/doom-nano"))
 #+end_src
 #+begin_src elisp
 (require 'doom-nano-ui)
-(setq doom-theme 'doom-nano-light) ;; or dark
+;; (setq doom-theme 'doom-nano-light) ;; or dark
 #+end_src
 
-#+RESULTS:
-: doom-nano-light
-
 Outras mudanças que eu fiz.
-#+begin_src elisp :results silent
+#+begin_src elisp :results silent :tangle no
 (add-to-list 'load-path "~/bin/nano-emacs/")
 (require 'nano-theme-light)
 (require 'nano-faces)
@@ -703,11 +796,27 @@ Outras mudanças que eu fiz.
                     :foreground nano-color-salient)
 (set-face-attribute 'org-level-1 nil
                     :weight 'bold)
-;; (set-face-attribute 'flyspell-incorrect nil
-;;                     :foreground nano-color-foreground
-;;                     :underline `(:style wave :color nano-color-salient))
-;; TODO Changed buffer modeline
-;; TODO Flyspell incorrect
-;; TODO org-link underline
+;; Não lembro de onde essa mudança vem...
+(set-face-attribute 'comint-highlight-prompt nil
+                    :foreground nano-color-salient :weight 'bold)
+
+#+end_src
+** ronisbr
+https://github.com/ronisbr/doom-nano-themes
+
+#+begin_src elisp :tangle packages.el
+(package! doom-nano-modeline
+  :recipe (:host github
+  :repo "ronisbr/doom-nano-modeline"))
+#+end_src
+#+begin_src elisp
+(use-package! doom-nano-modeline
+  :config
+  (doom-nano-modeline-mode 1)
+  (global-hide-mode-line-mode 1))
+
+(setq doom-theme 'other-doom-nano-light) ;; or dark
 #+end_src
 
+#+RESULTS:
+: t
